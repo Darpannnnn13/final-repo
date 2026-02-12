@@ -1,0 +1,14 @@
+.venv
+__pycache__
+*.pyc
+.env
+.git
+node_modules
+client.py
+config_client.py
+*.bat
+*.vbs
+requirements-client.txt
+requirements-full.txt
+DEPLOYMENT.md
+README.md

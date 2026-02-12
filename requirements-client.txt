@@ -1,0 +1,40 @@
+# ==================== CLIENT REQUIREMENTS ====================
+# ParentEye Client - Full Dependencies for Child's PC
+# Monitoring, Keystroke Logging, App Blocking, Screen Capture
+# =========================================================
+
+# Core Communication
+flask>=3.0.0
+pymongo>=4.6.0
+requests>=2.31.0
+python-dotenv>=1.0.0
+
+# System Monitoring & Control
+psutil>=5.9.0
+pyautogui>=0.9.53  # Mouse/keyboard automation
+pynput>=1.7.6  # Keyboard listener for keystroke logging
+
+# Screen & Media Capture
+mss>=8.0.0  # Fast screen capture
+imageio>=2.31.0  # Video recording
+imageio-ffmpeg>=0.4.8  # FFmpeg for video encoding
+opencv-python>=4.8.0  # Video processing
+Pillow>=10.0.0  # Image processing
+pygetwindow>=0.0.9  # Window detection
+
+# Data Processing
+numpy>=1.26.0  # Numerical arrays for image data
+sqlite3  # Browser history database access
+
+# Audio & Speech
+pyttsx3>=2.90  # Text-to-speech for alerts
+
+# Utilities & Security
+colorama>=0.4.6  # Colored console output
+cryptography>=41.0.7  # Encryption support
+
+# GPU Acceleration (Optional - uncomment if you have NVIDIA GPU)
+# opencv-python-headless>=4.8.0  # Headless OpenCV for servers
+
+# Browser Profile Access
+# Note: Direct file access via standard libraries

@@ -1,0 +1,1011 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ParentEye Pro - Advanced Monitoring Dashboard</title>
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- External CSS -->
+    <link rel="stylesheet" href="/static/styles.css">
+    
+    <style>
+        /* Additional dashboard-specific styles */
+        .device-selector {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            box-shadow: var(--shadow-md);
+        }
+
+        .device-selector h2 {
+            font-size: 20px;
+            margin-bottom: 20px;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .location-display {
+            background: linear-gradient(135deg, #f0fdf4 0%, #e0f2fe 100%);
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 15px;
+            border: 2px dashed var(--primary);
+        }
+
+        .location-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        .location-item {
+            background: white;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            border-left: 3px solid var(--primary);
+        }
+
+        .location-item strong {
+            color: var(--primary);
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .media-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .media-modal.active {
+            display: flex;
+        }
+
+        .media-modal-content {
+            background: white;
+            width: 100%;
+            max-width: 1000px;
+            border-radius: 12px;
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
+            animation: slideUp 0.4s ease;
+        }
+
+        .media-modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 25px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .media-modal-close {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: var(--transition);
+        }
+
+        .media-modal-close:hover {
+            background: rgba(255, 255, 255, 0.4);
+        }
+
+        .media-modal-body {
+            padding: 25px;
+            background: var(--light);
+            max-height: calc(90vh - 100px);
+            overflow-y: auto;
+        }
+
+        .media-modal-body img {
+            width: 100%;
+            max-height: 60vh;
+            object-fit: contain;
+            border-radius: 8px;
+            background: white;
+            padding: 10px;
+            border: 1px solid var(--border);
+        }
+
+        .media-modal-body iframe {
+            width: 100%;
+            height: 60vh;
+            border: none;
+            border-radius: 8px;
+        }
+
+        .media-details {
+            margin-top: 15px;
+            font-size: 13px;
+            color: var(--dark);
+            line-height: 1.8;
+        }
+
+        .media-details div {
+            margin-bottom: 8px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .media-details strong {
+            color: var(--primary);
+            display: inline-block;
+            width: 140px;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-online {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+        }
+
+        .status-offline {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--danger);
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 6px;
+        }
+
+        .status-indicator.online {
+            background: var(--success);
+        }
+
+        .status-indicator.offline {
+            background: var(--danger);
+        }
+
+        .device-status {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 8px;
+        }
+
+        .device-status.online {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+        }
+
+        .device-status.offline {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--danger);
+        }
+
+        .btn-tts {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid rgba(149, 158, 10, 0.5);
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 12px;
+            transition: all var(--transition);
+        }
+
+        .btn-tts:hover {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: #fbbf24;
+        }
+
+        .btn-tts.active {
+            background: #f59e0b;
+            border-color: #d97706;
+            animation: pulse-tts 2s infinite;
+        }
+
+        @keyframes pulse-tts {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .btn-info {
+            background: linear-gradient(135deg, #3b82f6 0%, #0ea5e9 100%);
+            color: white;
+        }
+
+        .btn-info:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4);
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @media (max-width: 768px) {
+            .location-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .media-modal-body img {
+                max-height: 50vh;
+            }
+
+            .media-modal-body iframe {
+                height: 50vh;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- ========== HEADER ========== -->
+    <div class="header">
+        <div class="header-left">
+            <h1>
+                <i class="fas fa-shield-alt"></i>
+                ParentEye Pro
+            </h1>
+            <p>Advanced Device Monitoring Dashboard</p>
+        </div>
+        <div class="header-right">
+            <!-- Text-to-Speech Button -->
+            <button class="btn-tts" id="ttsButton" onclick="toggleTTS()" title="Toggle Text-to-Speech">
+                <i class="fas fa-volume-up"></i>
+                <span>Voice</span>
+            </button>
+
+            <div class="profile-section">
+                <div class="profile-avatar" id="profileAvatar">P</div>
+                <div class="profile-info">
+                    <h3 id="profileName">Parent User</h3>
+                    <p id="profileRole">Admin</p>
+                </div>
+            </div>
+            <a href="/logout" class="btn-logout" title="Logout">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- ========== MAIN CONTAINER ========== -->
+    <div class="container">
+        <!-- Device Selector -->
+        <div class="device-selector">
+            <h2>
+                <i class="fas fa-mobile-alt"></i>
+                Select Monitored Device
+            </h2>
+            <div id="device-cards" class="device-cards"></div>
+        </div>
+
+        <!-- Offline Warning -->
+        <div id="offline-warning" class="offline-warning" style="display: none;">
+            <i class="fas fa-exclamation-triangle"></i>
+            <span>Selected device is offline. Last update: <span id="last-update"></span></span>
+        </div>
+
+        <!-- Tabs Container -->
+        <div class="tabs-container">
+            <!-- Tab Headers -->
+            <div class="tabs-header">
+                <button class="tab-btn active" onclick="switchTab('monitoring')">
+                    <i class="fas fa-chart-line"></i>
+                    Monitoring Dashboard
+                </button>
+                <button class="tab-btn" onclick="switchTab('advanced')">
+                    <i class="fas fa-sliders-h"></i>
+                    Advanced Controls
+                </button>
+            </div>
+
+            <!-- Tab Content -->
+            <div class="tabs-content">
+                <!-- ========== TAB 1: MONITORING ========== -->
+                <div id="monitoring" class="tab-pane active">
+                    <div class="section-grid">
+                        <!-- Screen & Activity Monitoring -->
+                        <div class="section-box">
+                            <h3>
+                                <i class="fas fa-camera"></i>
+                                Screen & Activity Monitoring
+                            </h3>
+                            <div class="controls-grid">
+                                <button class="btn-primary" onclick="requestMedia('screenshot', 'Screenshot')">
+                                    <i class="fas fa-image"></i>
+                                    Screenshot
+                                </button>
+                                <button class="btn-primary" onclick="requestMedia('webcam', 'Webcam')">
+                                    <i class="fas fa-video"></i>
+                                    Webcam
+                                </button>
+                                <button class="btn-primary" onclick="loadHistory()">
+                                    <i class="fas fa-globe"></i>
+                                    History
+                                </button>
+                            </div>
+                            <div id="monitoring-output" class="output-box">Ready...</div>
+                        </div>
+
+                        <!-- Keystroke Monitoring -->
+                        <div class="section-box">
+                            <h3>
+                                <i class="fas fa-keyboard"></i>
+                                Keystroke & Location
+                            </h3>
+                            <button class="btn-success" style="width: 100%; margin-bottom: 15px;">
+                                <i class="fas fa-check-circle"></i>
+                                Keystroke Monitoring: ACTIVE
+                            </button>
+                            <div style="margin-top: 15px;">
+                                <button class="btn-info" onclick="refreshKeystroke()" style="width: 100%; margin-bottom: 10px;">
+                                    <i class="fas fa-sync"></i>
+                                    Refresh Keystrokes
+                                </button>
+                                <div id="keystroke-output" class="output-box">Waiting for keystrokes...</div>
+                            </div>
+                        </div>
+
+                        <!-- Location Tracking (Full Width) -->
+                        <div class="section-box" style="grid-column: 1 / -1;">
+                            <h3>
+                                <i class="fas fa-map-marker-alt"></i>
+                                Live Location Tracking
+                            </h3>
+                            <div style="display: flex; gap: 10px;">
+                                <button class="btn-primary" onclick="showLocation()" style="flex: 1;">
+                                    <i class="fas fa-compass"></i>
+                                    Show Location
+                                </button>
+                                <button class="btn-info" onclick="refreshLocation()" style="flex: 1;">
+                                    <i class="fas fa-sync"></i>
+                                    Refresh Location
+                                </button>
+                            </div>
+                            <div id="location-display" class="location-display" style="display: none;"></div>
+                            <div id="map-container" style="width: 100%; height: 300px; margin-top: 15px; border-radius: 8px; overflow: hidden; display: none;">
+                                <iframe id="location-map" width="100%" height="100%" style="border: none;"></iframe>
+                            </div>
+                            <button class="btn-info" onclick="openLocationModal()" style="width: 100%; margin-top: 12px;">
+                                <i class="fas fa-expand"></i>
+                                Open Full Map
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ========== TAB 2: ADVANCED CONTROLS ========== -->
+                <div id="advanced" class="tab-pane">
+                    <div class="section-grid">
+                        <!-- Website Blocking -->
+                        <div class="section-box">
+                            <h3>
+                                <i class="fas fa-ban"></i>
+                                Website Blocking
+                            </h3>
+                            <div class="input-group">
+                                <input type="text" id="website-input" placeholder="facebook.com, youtube.com">
+                            </div>
+                            <div style="display: flex; gap: 10px;">
+                                <button class="btn-danger" onclick="blockWebsites()" style="flex: 1;">
+                                    <i class="fas fa-times-circle"></i>
+                                    Block
+                                </button>
+                                <button class="btn-success" onclick="unblockWebsites()" style="flex: 1;">
+                                    <i class="fas fa-check-circle"></i>
+                                    Unblock
+                                </button>
+                            </div>
+                            <div id="website-output" class="output-box" style="margin-top: 15px;">Ready...</div>
+                        </div>
+
+                        <!-- Application Blocking -->
+                        <div class="section-box">
+                            <h3>
+                                <i class="fas fa-gamepad"></i>
+                                Application Blocking
+                            </h3>
+                            <div class="input-group">
+                                <input type="text" id="exe-input" placeholder="discord, chrome, fortnite">
+                            </div>
+                            <div style="display: flex; gap: 10px;">
+                                <button class="btn-danger" onclick="blockExe()" style="flex: 1;">
+                                    <i class="fas fa-times-circle"></i>
+                                    Block
+                                </button>
+                                <button class="btn-success" onclick="unblockExe()" style="flex: 1;">
+                                    <i class="fas fa-check-circle"></i>
+                                    Unblock
+                                </button>
+                            </div>
+                            <div id="exe-output" class="output-box" style="margin-top: 15px;">Ready...</div>
+                        </div>
+
+                        <!-- Dangerous Commands -->
+                        <div class="section-box" style="grid-column: 1 / -1;">
+                            <h3>
+                                <i class="fas fa-exclamation-circle"></i>
+                                Critical Commands (Use with Caution)
+                            </h3>
+                            <div class="controls-grid">
+                                <button class="btn-primary" onclick="executeCommand('lock')">
+                                    <i class="fas fa-lock"></i>
+                                    Lock PC
+                                </button>
+                                <button class="btn-warning" onclick="executeCommand('logout')">
+                                    <i class="fas fa-door-open"></i>
+                                    Logout
+                                </button>
+                                <button class="btn-danger" onclick="executeCommand('restart')">
+                                    <i class="fas fa-sync-alt"></i>
+                                    Restart
+                                </button>
+                                <button class="btn-danger" onclick="executeCommand('shutdown')">
+                                    <i class="fas fa-power-off"></i>
+                                    Shutdown
+                                </button>
+                            </div>
+                            <div id="dangerous-output" class="output-box" style="margin-top: 15px;">Ready...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== MEDIA VIEWER MODAL ========== -->
+    <div id="media-modal" class="media-modal" onclick="closeModal(event)">
+        <div class="media-modal-content" onclick="event.stopPropagation()">
+            <div class="media-modal-header">
+                <div>
+                    <i class="fas fa-eye" style="margin-right: 8px;"></i>
+                    <span id="media-modal-title">Viewer</span>
+                </div>
+                <button class="media-modal-close" onclick="closeModal(event)">
+                    <i class="fas fa-times"></i>
+                    Close
+                </button>
+            </div>
+            <div class="media-modal-body" id="media-modal-body">
+                Loading...
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== TEXT-TO-SPEECH MODULE ========== -->
+    <script src="/static/tts.js"></script>
+
+    <!-- ========== DASHBOARD SCRIPT ========== -->
+    <script>
+        let selectedDevice = null;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            updateProfileInfo();
+            loadDevices();
+            setupAutoRefresh();
+            initializeTTS();
+        });
+
+        // Initialize TTS
+        function initializeTTS() {
+            const button = document.getElementById('ttsButton');
+            if (tts.isEnabled) {
+                button.classList.add('active');
+                button.style.backgroundColor = '#f59e0b';
+            }
+            // Test TTS is working
+            if (tts.isEnabled) {
+                tts.speak('Dashboard loaded');
+            }
+        }
+
+        // Toggle TTS
+        function toggleTTS() {
+            const button = document.getElementById('ttsButton');
+            const enabled = tts.toggle();
+            
+            if (enabled) {
+                button.classList.add('active');
+                button.style.backgroundColor = '#f59e0b';
+                button.innerHTML = '<i class="fas fa-volume-up"></i><span>Voice ON</span>';
+                announceMessage('Text to speech enabled', 'success');
+            } else {
+                button.classList.remove('active');
+                button.style.backgroundColor = '';
+                button.innerHTML = '<i class="fas fa-volume-mute"></i><span>Voice OFF</span>';
+            }
+        }
+
+        // Announce messages
+        function announceMessage(message, type = 'info') {
+            if (tts.isEnabled) {
+                tts.announceNotification(message, type);
+            }
+        }
+
+        // Update profile info from backend
+        function updateProfileInfo() {
+            fetch('/api/user/profile')
+                .then(res => res.json())
+                .then(user => {
+                    const profileName = user.username || 'Parent User';
+                    const profileRole = user.role || 'Admin';
+                    const initials = profileName.substring(0, 2).toUpperCase();
+                    
+                    document.getElementById('profileName').textContent = profileName;
+                    document.getElementById('profileRole').textContent = profileRole;
+                    document.getElementById('profileAvatar').textContent = initials;
+                    
+                    localStorage.setItem('username', profileName);
+                    localStorage.setItem('userRole', profileRole);
+                })
+                .catch(err => console.error('Failed to load profile:', err));
+        }
+
+        // Load devices as cards
+        function loadDevices() {
+            fetch('/api/devices')
+                .then(res => res.json())
+                .then(devices => {
+                    const cardsContainer = document.getElementById('device-cards');
+                    cardsContainer.innerHTML = '';
+                    
+                    if (devices.length === 0) {
+                        cardsContainer.innerHTML = '<p style="color: #999;">No devices registered yet</p>';
+                        return;
+                    }
+                    
+                    devices.forEach(device => {
+                        const isOnline = device.status === 'online';
+                        const card = document.createElement('div');
+                        card.className = `device-card ${selectedDevice === device.device_id ? 'active' : ''}`;
+                        card.onclick = () => selectDevice(device.device_id);
+                        card.innerHTML = `
+                            <h3>${device.device_name}</h3>
+                            <p><strong>ID:</strong> ${device.device_id}</p>
+                            <p><strong>Parent:</strong> ${device.parent_name || 'Unassigned'}</p>
+                            <div class="device-status ${isOnline ? 'online' : 'offline'}">
+                                <span class="status-indicator ${isOnline ? 'online' : 'offline'}"></span>
+                                ${isOnline ? 'Online' : 'Offline'}
+                            </div>
+                        `;
+                        cardsContainer.appendChild(card);
+                    });
+                })
+                .catch(err => {
+                    console.error('Failed to load devices:', err);
+                    announceMessage('Failed to load devices', 'error');
+                });
+        }
+
+        // Setup auto-refresh
+        function setupAutoRefresh() {
+            setInterval(loadDevices, 30000);
+            
+            setInterval(() => {
+                if (selectedDevice && document.getElementById('monitoring').classList.contains('active')) {
+                    refreshKeystroke();
+                }
+            }, 15000);
+        }
+
+        // Switch tabs
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-pane').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+            
+            announceMessage(`Switched to ${tabName} tab`, 'info');
+        }
+
+        // Select device
+        function selectDevice(deviceId) {
+            selectedDevice = deviceId;
+            if (!selectedDevice) {
+                alert('Please select a device');
+                return;
+            }
+            loadDevices();
+            announceMessage(`Device selected: ${deviceId}`, 'success');
+        }
+
+        // Show location
+        function showLocation() {
+            if (!selectedDevice) {
+                alert('Please select a device first');
+                announceMessage('Please select a device first', 'warning');
+                return;
+            }
+            
+            fetch(`/api/location/${selectedDevice}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data) {
+                        const loc = data.location ? data.location : data;
+                        let html = '<div class="location-grid">';
+                        html += `<div class="location-item"><strong>City</strong> ${loc.city || 'N/A'}</div>`;
+                        html += `<div class="location-item"><strong>Region</strong> ${loc.region || loc.state || 'N/A'}</div>`;
+                        html += `<div class="location-item"><strong>Country</strong> ${loc.country || 'N/A'}</div>`;
+                        html += `<div class="location-item"><strong>ZIP</strong> ${loc.zip || 'N/A'}</div>`;
+                        html += `<div class="location-item"><strong>ISP</strong> ${loc.isp || 'N/A'}</div>`;
+                        html += `<div class="location-item"><strong>Timezone</strong> ${loc.timezone || 'N/A'}</div>`;
+                        if (loc.ip) html += `<div class="location-item"><strong>IP Address</strong> ${loc.ip}</div>`;
+                        if (loc.lat && loc.lon) {
+                            html += `<div class="location-item"><strong>Latitude</strong> ${loc.lat}</div>`;
+                            html += `<div class="location-item"><strong>Longitude</strong> ${loc.lon}</div>`;
+                        }
+                        html += `</div>`;
+                        document.getElementById('location-display').innerHTML = html;
+                        document.getElementById('location-display').style.display = 'block';
+                        
+                        if (loc.lat && loc.lon) {
+                            const mapUrl = `https://www.openstreetmap.org/export/embed.html?bbox=${loc.lon-0.01},${loc.lat-0.01},${loc.lon+0.01},${loc.lat+0.01}&layer=mapnik&marker=${loc.lat},${loc.lon}`;
+                            document.getElementById('location-map').src = mapUrl;
+                            document.getElementById('map-container').style.display = 'block';
+                        }
+                        
+                        announceMessage(`Location updated: ${loc.city}, ${loc.country}`, 'success');
+                    }
+                })
+                .catch(err => {
+                    document.getElementById('location-display').innerHTML = '<p>Error fetching location</p>';
+                    document.getElementById('location-display').style.display = 'block';
+                    announceMessage('Error fetching location', 'error');
+                });
+        }
+
+        function refreshLocation() {
+            showLocation();
+        }
+
+        function openLocationModal() {
+            if (!selectedDevice) return alert('Select device first');
+            fetch(`/api/location/${selectedDevice}`)
+                .then(res => res.json())
+                .then(data => {
+                    const loc = data.location ? data.location : data;
+                    const mapUrl = (loc.lat && loc.lon)
+                        ? `https://www.openstreetmap.org/export/embed.html?bbox=${loc.lon-0.02},${loc.lat-0.02},${loc.lon+0.02},${loc.lat+0.02}&layer=mapnik&marker=${loc.lat},${loc.lon}`
+                        : '';
+                    const details = `
+                        <div class="media-details">
+                            <div><strong>City:</strong> ${loc.city || 'N/A'}</div>
+                            <div><strong>Region:</strong> ${loc.region || loc.state || 'N/A'}</div>
+                            <div><strong>Country:</strong> ${loc.country || 'N/A'}</div>
+                            <div><strong>ZIP Code:</strong> ${loc.zip || 'N/A'}</div>
+                            <div><strong>ISP:</strong> ${loc.isp || 'N/A'}</div>
+                            <div><strong>Timezone:</strong> ${loc.timezone || 'N/A'}</div>
+                            <div><strong>IP Address:</strong> ${loc.ip || 'N/A'}</div>
+                            <div><strong>Coordinates:</strong> ${loc.lat || 'N/A'}, ${loc.lon || 'N/A'}</div>
+                        </div>
+                    `;
+                    const content = mapUrl
+                        ? `<iframe src="${mapUrl}"></iframe>${details}`
+                        : `<div class="media-details">No coordinates available.</div>${details}`;
+                    openModal('Live Location Map', content);
+                    announceMessage('Location map opened', 'info');
+                })
+                .catch(() => {
+                    openModal('Live Location Map', '<div class="media-details">Unable to load location.</div>');
+                    announceMessage('Unable to load location', 'error');
+                });
+        }
+
+        function refreshKeystroke() {
+            if (!selectedDevice) return;
+            
+            fetch(`/api/keystrokes/${selectedDevice}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (Array.isArray(data) && data.length > 0) {
+                        const output = data.map(k => k.text).reverse().join(' ');
+                        document.getElementById('keystroke-output').textContent = output.substring(0, 500);
+                        announceMessage(`New keystrokes received`, 'info');
+                    } else {
+                        document.getElementById('keystroke-output').textContent = 'No keystrokes captured yet...';
+                    }
+                })
+                .catch(err => {
+                    document.getElementById('keystroke-output').textContent = 'Error loading keystrokes...';
+                });
+        }
+
+        function blockWebsites() {
+            if (!selectedDevice) return alert('Select device first');
+            const websites = document.getElementById('website-input').value.split(',').map(w => w.trim()).filter(w => w);
+            
+            if (websites.length === 0) return alert('Enter at least one website');
+            
+            let completed = 0;
+            const outputDiv = document.getElementById('website-output');
+            outputDiv.textContent = `Blocking ${websites.length} website(s)...`;
+            announceMessage(`Blocking ${websites.length} websites`, 'info');
+            
+            websites.forEach(site => {
+                fetch('/api/command/block-site', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({device_id: selectedDevice, site: site})
+                })
+                .then(res => res.json())
+                .then(data => {
+                    completed++;
+                    if (data.command_id) {
+                        outputDiv.textContent = `Queued (${completed}/${websites.length}): ${websites.slice(0, completed).join(', ')}`;
+                    }
+                    if (completed === websites.length) {
+                        pollResult('block_site', 'website-output', 10);
+                        document.getElementById('website-input').value = '';
+                        announceMessage(`Website blocking initiated`, 'success');
+                    }
+                })
+                .catch(err => {
+                    outputDiv.textContent = `Error blocking ${site}: ${err}`;
+                });
+            });
+        }
+
+        function unblockWebsites() {
+            if (!selectedDevice) return alert('Select device first');
+            const websites = document.getElementById('website-input').value.split(',').map(w => w.trim()).filter(w => w);
+            
+            if (websites.length === 0) return alert('Enter at least one website');
+            
+            let completed = 0;
+            const outputDiv = document.getElementById('website-output');
+            outputDiv.textContent = `Unblocking ${websites.length} website(s)...`;
+            announceMessage(`Unblocking ${websites.length} websites`, 'info');
+            
+            websites.forEach(site => {
+                fetch('/api/command/unblock-site', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({device_id: selectedDevice, site: site})
+                })
+                .then(res => res.json())
+                .then(data => {
+                    completed++;
+                    if (data.command_id) {
+                        outputDiv.textContent = `Queued (${completed}/${websites.length}): ${websites.slice(0, completed).join(', ')}`;
+                    }
+                    if (completed === websites.length) {
+                        pollResult('unblock_site', 'website-output', 10);
+                        document.getElementById('website-input').value = '';
+                        announceMessage(`Website unblocking initiated`, 'success');
+                    }
+                })
+                .catch(err => {
+                    outputDiv.textContent = `Error unblocking ${site}: ${err}`;
+                });
+            });
+        }
+
+        function blockExe() {
+            if (!selectedDevice) return alert('Select device first');
+            const exe = document.getElementById('exe-input').value.trim();
+            
+            if (!exe) return alert('Enter application name');
+            
+            fetch('/api/command/block-app', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({device_id: selectedDevice, app_name: exe})
+            })
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('exe-output').textContent = `Command queued: ${exe}`;
+                document.getElementById('exe-input').value = '';
+                announceMessage(`Blocking application: ${exe}`, 'info');
+                pollResult('block_app', 'exe-output', 10);
+            })
+            .catch(err => {
+                document.getElementById('exe-output').textContent = `Error: ${err}`;
+            });
+        }
+
+        function unblockExe() {
+            if (!selectedDevice) return alert('Select device first');
+            const exe = document.getElementById('exe-input').value.trim();
+            
+            if (!exe) return alert('Enter application name');
+            
+            fetch('/api/command/unblock-app', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({device_id: selectedDevice, app_name: exe})
+            })
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('exe-output').textContent = `Command queued: ${exe}`;
+                document.getElementById('exe-input').value = '';
+                announceMessage(`Unblocking application: ${exe}`, 'info');
+                pollResult('unblock_app', 'exe-output', 10);
+            })
+            .catch(err => {
+                document.getElementById('exe-output').textContent = `Error: ${err}`;
+            });
+        }
+
+        function executeCommand(cmd) {
+            if (!selectedDevice) return alert('Select device first');
+            
+            if (['shutdown', 'restart', 'logout'].includes(cmd)) {
+                if (!confirm(`Are you sure you want to ${cmd} the selected device?`)) {
+                    return;
+                }
+            }
+            
+            fetch('/api/command/execute', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({device_id: selectedDevice, command: cmd})
+            })
+            .then(res => res.json())
+            .then(data => {
+                const output = `Command '${cmd}' sent to device`;
+                document.getElementById('dangerous-output').textContent = output;
+                announceMessage(`Command executed: ${cmd}`, 'success');
+            })
+            .catch(err => {
+                document.getElementById('dangerous-output').textContent = `Error: ${err}`;
+                announceMessage(`Error executing command: ${cmd}`, 'error');
+            });
+        }
+
+        function requestMedia(mediaType, label) {
+            if (!selectedDevice) return alert('Select device first');
+            openModal(label, '<div class="media-details">Preparing media...</div>');
+            announceMessage(`Requesting ${label}`, 'info');
+
+            fetch('/api/command/execute', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({device_id: selectedDevice, command: mediaType})
+            })
+            .then(res => res.json())
+            .then(() => pollMedia(mediaType, label, 10))
+            .catch(err => {
+                openModal(label, `<div class="media-details">Error: ${err}</div>`);
+                announceMessage(`Error requesting ${label}`, 'error');
+            });
+        }
+
+        function pollMedia(mediaType, label, attemptsLeft) {
+            fetch(`/api/media/${selectedDevice}?type=${mediaType}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data && data.image_base64) {
+                        const imgTag = `<img src="data:image/${mediaType === 'webcam' ? 'jpeg' : 'png'};base64,${data.image_base64}" alt="${label}" />`;
+                        const details = `<div class="media-details">Captured: ${data.created_at || 'Just now'}</div>`;
+                        openModal(label, imgTag + details);
+                        announceMessage(`${label} received`, 'success');
+                        return;
+                    }
+                    if (attemptsLeft > 0) {
+                        setTimeout(() => pollMedia(mediaType, label, attemptsLeft - 1), 1500);
+                    } else {
+                        openModal(label, '<div class="media-details">No media available yet. Try again.</div>');
+                        announceMessage(`No ${label} available yet`, 'warning');
+                    }
+                })
+                .catch(() => {
+                    if (attemptsLeft > 0) {
+                        setTimeout(() => pollMedia(mediaType, label, attemptsLeft - 1), 1500);
+                    } else {
+                        openModal(label, '<div class="media-details">Unable to load media.</div>');
+                    }
+                });
+        }
+
+        function loadHistory() {
+            if (!selectedDevice) return alert('Select device first');
+            openModal('Browser History', '<div class="media-details">Preparing history...</div>');
+            announceMessage('Loading browser history', 'info');
+
+            fetch('/api/command/execute', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({device_id: selectedDevice, command: 'chromehistory'})
+            })
+            .then(() => pollHistory(10))
+            .catch(err => {
+                openModal('Browser History', `<div class="media-details">Error: ${err}</div>`);
+                announceMessage('Error loading history', 'error');
+            });
+        }
+
+        function pollHistory(attemptsLeft) {
+            fetch(`/api/history/${selectedDevice}`)
+                .then(res => res.json())
+                .then(history => {
+                    if (Array.isArray(history) && history.length > 0) {
+                        const list = history.map(h => `<div>• ${h.title || h.url}</div>`).join('');
+                        openModal('Browser History', `<div class="media-details">${list}</div>`);
+                        announceMessage(`Loaded ${history.length} browser history entries`, 'success');
+                    } else if (attemptsLeft > 0) {
+                        setTimeout(() => pollHistory(attemptsLeft - 1), 1500);
+                    } else {
+                        openModal('Browser History', '<div class="media-details">No history available yet. Try again.</div>');
+                        announceMessage('No history available', 'warning');
+                    }
+                })
+                .catch(() => {
+                    if (attemptsLeft > 0) {
+                        setTimeout(() => pollHistory(attemptsLeft - 1), 1500);
+                    }
+                });
+        }
+
+        function pollResult(command, outputId, attemptsLeft) {
+            fetch(`/api/results/${selectedDevice}?command=${command}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data && data.data) {
+                        const message = data.data.message || JSON.stringify(data.data);
+                        document.getElementById(outputId).textContent = data.success ? message : `Error: ${message}`;
+                        announceMessage(message, data.success ? 'success' : 'error');
+                    } else if (attemptsLeft > 0) {
+                        setTimeout(() => pollResult(command, outputId, attemptsLeft - 1), 1500);
+                    } else {
+                        document.getElementById(outputId).textContent = 'No response yet. Ensure client is running as admin.';
+                        announceMessage('No response from device', 'warning');
+                    }
+                })
+                .catch(() => {
+                    if (attemptsLeft > 0) {
+                        setTimeout(() => pollResult(command, outputId, attemptsLeft - 1), 1500);
+                    }
+                });
+        }
+
+        function openModal(title, contentHtml) {
+            document.getElementById('media-modal-title').textContent = title;
+            document.getElementById('media-modal-body').innerHTML = contentHtml;
+            document.getElementById('media-modal').classList.add('active');
+        }
+
+        function closeModal(event) {
+            if (event) {
+                event.stopPropagation();
+            }
+            document.getElementById('media-modal').classList.remove('active');
+        }
+    </script>
+</body>
+</html>
