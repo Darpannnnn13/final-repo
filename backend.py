@@ -33,7 +33,7 @@ load_dotenv()
 
 app = Flask(__name__)
 
-# ⚠️ Load from .env file ⚠️
+# ️ Load from .env file ️
 ADMIN_PASSWORD = os.getenv('ADMIN_PASSWORD', 'YourSecurePassword123')
 SUPER_ADMIN_PASSWORD = os.getenv('SUPER_ADMIN_PASSWORD', 'SuperAdmin@2026')
 GEMINI_API_KEY = os.getenv('GEMINI_API_KEY', '').strip()
@@ -143,7 +143,7 @@ def login():
                 session['login_time'] = datetime.now().isoformat()
                 return redirect('/')
         
-        return render_template_string(LOGIN_HTML, error="❌ Wrong credentials! Try again.")
+        return render_template_string(LOGIN_HTML, error=" Wrong credentials! Try again.")
     
     return render_template_string(LOGIN_HTML, error="")
 
@@ -158,13 +158,13 @@ def register():
         password = request.form.get('password', '')
 
         if not username or not password:
-            return render_template_string(REGISTER_HTML, error="❌ Username and password are required.")
+            return render_template_string(REGISTER_HTML, error=" Username and password are required.")
 
         if username.lower() == 'admin':
-            return render_template_string(REGISTER_HTML, error="❌ Username 'admin' is reserved.")
+            return render_template_string(REGISTER_HTML, error=" Username 'admin' is reserved.")
 
         if parents_col.find_one({"username": username}):
-            return render_template_string(REGISTER_HTML, error="❌ Username already exists.")
+            return render_template_string(REGISTER_HTML, error=" Username already exists.")
 
         parent_doc = {
             "name": name or username,
@@ -175,7 +175,7 @@ def register():
             "created_at": datetime.now()
         }
         parents_col.insert_one(parent_doc)
-        return render_template_string(REGISTER_HTML, success="✅ Account created. You can log in now.")
+        return render_template_string(REGISTER_HTML, success=" Account created. You can log in now.")
 
     return render_template_string(REGISTER_HTML, error="")
 
@@ -199,7 +199,7 @@ def get_user_profile():
         "login_time": session.get('login_time', '')
     }
     
-    print(f"[{datetime.now().isoformat()}] 👤 Profile retrieved for user: {user_info['username']}")
+    print(f"[{datetime.now().isoformat()}]  Profile retrieved for user: {user_info['username']}")
     return jsonify(user_info)
 
 # ==================== ADMIN PANEL ====================
@@ -261,12 +261,12 @@ def add_parent():
     
     # Check if username already exists
     if parents_col.find_one({"username": parent_doc['username']}):
-        print(f"[{datetime.now().isoformat()}] ⚠️ Parent creation failed: Username '{parent_doc['username']}' already exists")
+        print(f"[{datetime.now().isoformat()}] ️ Parent creation failed: Username '{parent_doc['username']}' already exists")
         return jsonify({"error": "Username already exists"}), 400
     
     result = parents_col.insert_one(parent_doc)
     parent_id = str(result.inserted_id)
-    print(f"[{datetime.now().isoformat()}] ✓ New parent created: {parent_doc['name']} (ID: {parent_id})")
+    print(f"[{datetime.now().isoformat()}]  New parent created: {parent_doc['name']} (ID: {parent_id})")
     return jsonify({"status": "success", "parent_id": parent_id})
 
 @app.route('/api/admin/parent/<parent_id>', methods=['PUT'])
@@ -326,13 +326,13 @@ def assign_device_to_parent(device_id):
             {"device_id": device_id},
             {"$set": {"parent_id": parent_id, "assigned_at": datetime.now()}}
         )
-        print(f"[{datetime.now().isoformat()}] ✓ Device '{device_id}' assigned to parent '{parent_name}' (ID: {parent_id})")
+        print(f"[{datetime.now().isoformat()}]  Device '{device_id}' assigned to parent '{parent_name}' (ID: {parent_id})")
     else:
         devices_col.update_one(
             {"device_id": device_id},
             {"$unset": {"parent_id": ""}, "$set": {"unassigned_at": datetime.now()}}
         )
-        print(f"[{datetime.now().isoformat()}] ✓ Device '{device_id}' unassigned from parent")
+        print(f"[{datetime.now().isoformat()}]  Device '{device_id}' unassigned from parent")
     
     return jsonify({"status": "success"})
 
@@ -479,7 +479,7 @@ LOGIN_HTML = '''
 </head>
 <body>
     <div class="login-container">
-        <h1>👶 Child Monitor</h1>
+        <h1> Child Monitor</h1>
         <p class="subtitle">Parental Control System</p>
         
         {% if error %}
@@ -487,8 +487,8 @@ LOGIN_HTML = '''
         {% endif %}
         
         <div class="info">
-            🔒 <strong>Admin:</strong> username=admin, Super Admin password<br>
-            🔒 <strong>Parent:</strong> Enter your username and password
+             <strong>Admin:</strong> username=admin, Super Admin password<br>
+             <strong>Parent:</strong> Enter your username and password
         </div>
         
         <form method="post">
@@ -663,7 +663,7 @@ REGISTER_HTML = '''
 </head>
 <body>
     <div class="register-container">
-        <h1>👨‍👩‍👧 Parent Registration</h1>
+        <h1>‍‍ Parent Registration</h1>
         <p class="subtitle">Create your parent account</p>
         
         {% if error %}
@@ -913,7 +913,7 @@ ADMIN_PANEL_HTML = '''
 <body>
     <div class="header">
         <div>
-            <h1>👑 Admin Panel</h1>
+            <h1> Admin Panel</h1>
             <p>Manage parents and monitor all devices</p>
         </div>
         <a href="/logout" class="btn btn-logout">Logout</a>
@@ -937,7 +937,7 @@ ADMIN_PANEL_HTML = '''
         
         <div class="section">
             <h2>
-                👨‍👩‍👧‍👦 Parents Management
+                ‍‍‍ Parents Management
                 <button class="btn btn-primary" onclick="showAddParentModal()">+ Add Parent</button>
             </h2>
             <table id="parentsTable">
@@ -970,7 +970,7 @@ ADMIN_PANEL_HTML = '''
         </div>
         
         <div class="section">
-            <h2>💻 All Monitored Devices</h2>
+            <h2> All Monitored Devices</h2>
             <table>
                 <thead>
                     <tr>
@@ -1063,14 +1063,14 @@ ADMIN_PANEL_HTML = '''
                 });
                 
                 if (response.ok) {
-                    alert('✅ Parent added successfully!');
+                    alert(' Parent added successfully!');
                     location.reload();
                 } else {
                     const error = await response.json();
-                    alert('❌ Error: ' + error.error);
+                    alert(' Error: ' + error.error);
                 }
             } catch (error) {
-                alert('❌ Error: ' + error.message);
+                alert(' Error: ' + error.message);
             }
         });
         
@@ -1083,13 +1083,13 @@ ADMIN_PANEL_HTML = '''
                 });
                 
                 if (response.ok) {
-                    alert('✅ Parent deleted successfully!');
+                    alert(' Parent deleted successfully!');
                     location.reload();
                 } else {
-                    alert('❌ Failed to delete parent');
+                    alert(' Failed to delete parent');
                 }
             } catch (error) {
-                alert('❌ Error: ' + error.message);
+                alert(' Error: ' + error.message);
             }
         }
         
@@ -1102,12 +1102,12 @@ ADMIN_PANEL_HTML = '''
                 });
                 
                 if (response.ok) {
-                    alert('✅ Device assigned successfully!');
+                    alert(' Device assigned successfully!');
                 } else {
-                    alert('❌ Failed to assign device');
+                    alert(' Failed to assign device');
                 }
             } catch (error) {
-                alert('❌ Error: ' + error.message);
+                alert(' Error: ' + error.message);
             }
         }
     </script>
@@ -1293,7 +1293,7 @@ def _generate_claim_code(device_id, device_name):
 @login_required
 def index():
     """Serve the parent monitoring dashboard"""
-    print(f"[{datetime.now().isoformat()}] ✓ Dashboard loaded for user: {session.get('user_id')}")
+    print(f"[{datetime.now().isoformat()}]  Dashboard loaded for user: {session.get('user_id')}")
     return render_template('index.html')
 
 @app.route('/api/register-device', methods=['POST'])
@@ -1313,12 +1313,12 @@ def register_device():
     existing = devices_col.find_one({"device_id": device_doc["device_id"]})
     if existing:
         devices_col.update_one({"device_id": device_doc["device_id"]}, {"$set": {**device_doc, "last_updated": datetime.now()}})
-        print(f"[{datetime.now().isoformat()}] ✓ Device updated: {device_doc['device_name']} ({device_doc['device_id']})")
+        print(f"[{datetime.now().isoformat()}]  Device updated: {device_doc['device_name']} ({device_doc['device_id']})")
         return jsonify({"status": "updated", "device_id": device_doc["device_id"]})
     
     result = devices_col.insert_one(device_doc)
     device_id = device_doc["device_id"]
-    print(f"[{datetime.now().isoformat()}] ✓ Device registered: {device_doc['device_name']} ({device_id})")
+    print(f"[{datetime.now().isoformat()}]  Device registered: {device_doc['device_name']} ({device_id})")
     return jsonify({"status": "registered", "device_id": str(result.inserted_id)})
 
 @app.route('/api/device/claim-code', methods=['POST'])
@@ -1341,7 +1341,7 @@ def get_claim_code():
         {"$set": {"device_name": device_name, "claim_code": claim_code, "claim_created_at": datetime.now()}},
         upsert=True
     )
-    print(f"[{datetime.now().isoformat()}] 🔑 Claim code generated for device {device_id}: {claim_code}")
+    print(f"[{datetime.now().isoformat()}]  Claim code generated for device {device_id}: {claim_code}")
     return jsonify({"status": "ok", "claim_code": claim_code})
 
 @app.route('/api/send-location', methods=['POST'])
@@ -1517,7 +1517,7 @@ def block_website():
         "created_at": datetime.now()
     })
     
-    print(f"[{datetime.now().isoformat()}] 🚫 Website blocked: {url} for device {device_id}")
+    print(f"[{datetime.now().isoformat()}]  Website blocked: {url} for device {device_id}")
     return jsonify({
         "status": "success",
         "_id": str(result.inserted_id),
@@ -1563,7 +1563,7 @@ def unblock_website():
         "created_at": datetime.now()
     })
     
-    print(f"[{datetime.now().isoformat()}] ✅ Website unblocked: {website_id} for device {device_id}")
+    print(f"[{datetime.now().isoformat()}]  Website unblocked: {website_id} for device {device_id}")
     return jsonify({"status": "success"})
 
 @app.route('/api/device/<device_id>/blocked-websites', methods=['GET'])
@@ -1596,7 +1596,7 @@ def get_devices():
             parent = parents_col.find_one({"_id": ObjectId(device["parent_id"])})
             device["parent_name"] = parent.get("name", "Unknown") if parent else "Unknown"
     
-    print(f"[{datetime.now().isoformat()}] 📱 Devices list retrieved ({len(devices)} devices)")
+    print(f"[{datetime.now().isoformat()}]  Devices list retrieved ({len(devices)} devices)")
     return jsonify(devices)
 
 @app.route('/api/parent/claim-device', methods=['POST'])
@@ -1620,7 +1620,7 @@ def claim_device():
         {"$set": {"parent_id": session.get('user_id'), "assigned_at": datetime.now(), "assigned_by": "parent-claim"}}
     )
 
-    print(f"[{datetime.now().isoformat()}] ✅ Device {device.get('device_id')} claimed by parent {session.get('user_id')}")
+    print(f"[{datetime.now().isoformat()}]  Device {device.get('device_id')} claimed by parent {session.get('user_id')}")
     return jsonify({
         "status": "success",
         "device_id": device.get("device_id"),
@@ -1633,7 +1633,7 @@ def get_device(device_id):
     """Get specific device info"""
     # Verify access
     if not verify_device_access(device_id):
-        print(f"[{datetime.now().isoformat()}] ⚠️ Unauthorized access attempt to device: {device_id} by user: {session.get('user_id')}")
+        print(f"[{datetime.now().isoformat()}] ️ Unauthorized access attempt to device: {device_id} by user: {session.get('user_id')}")
         return jsonify({"error": "Unauthorized: You don't have access to this device"}), 403
     
     device = devices_col.find_one({"device_id": device_id})
@@ -1645,7 +1645,7 @@ def get_device(device_id):
     device["last_seen"] = str(device.get("last_seen", ""))
     device["last_updated"] = str(device.get("last_updated", ""))
     
-    print(f"[{datetime.now().isoformat()}] 📱 Device details retrieved: {device_id}")
+    print(f"[{datetime.now().isoformat()}]  Device details retrieved: {device_id}")
     return jsonify(device)
 
 # ==================== COMMAND ENDPOINTS ====================
@@ -1673,11 +1673,11 @@ def cmd_lock():
     
     # Verify access
     if not verify_device_access(device_id):
-        print(f"[{datetime.now().isoformat()}] ⚠️ Unauthorized command attempt on device: {device_id} by user: {session.get('user_id')}")
+        print(f"[{datetime.now().isoformat()}] ️ Unauthorized command attempt on device: {device_id} by user: {session.get('user_id')}")
         return jsonify({"error": "Unauthorized: You don't have access to this device"}), 403
     
     command_id = store_command(device_id, "lock")
-    print(f"[{datetime.now().isoformat()}] 📤 Lock command queued for device: {device_id} (ID: {command_id})")
+    print(f"[{datetime.now().isoformat()}]  Lock command queued for device: {device_id} (ID: {command_id})")
     return jsonify({"status": "queued", "command_id": command_id})
 
 @app.route('/api/command/shutdown', methods=['POST'])
@@ -1687,7 +1687,7 @@ def cmd_shutdown():
     device_id = data.get('device_id')
     
     command_id = store_command(device_id, "shutdown")
-    print(f"[{datetime.now().isoformat()}] 📤 Shutdown command queued for device: {device_id} (ID: {command_id})")
+    print(f"[{datetime.now().isoformat()}]  Shutdown command queued for device: {device_id} (ID: {command_id})")
     return jsonify({"status": "queued", "command_id": command_id})
 
 @app.route('/api/command/restart', methods=['POST'])
@@ -1697,7 +1697,7 @@ def cmd_restart():
     device_id = data.get('device_id')
     
     command_id = store_command(device_id, "restart")
-    print(f"[{datetime.now().isoformat()}] 📤 Restart command queued for device: {device_id} (ID: {command_id})")
+    print(f"[{datetime.now().isoformat()}]  Restart command queued for device: {device_id} (ID: {command_id})")
     return jsonify({"status": "queued", "command_id": command_id})
 
 @app.route('/api/command/logout', methods=['POST'])
@@ -1707,7 +1707,7 @@ def cmd_logout():
     device_id = data.get('device_id')
     
     command_id = store_command(device_id, "logout")
-    print(f"[{datetime.now().isoformat()}] 📤 Logout command queued for device: {device_id} (ID: {command_id})")
+    print(f"[{datetime.now().isoformat()}]  Logout command queued for device: {device_id} (ID: {command_id})")
     return jsonify({"status": "queued", "command_id": command_id})
 
 # Generic command router
@@ -1725,7 +1725,7 @@ def execute_command():
     
     # Verify access
     if not verify_device_access(device_id):
-        print(f"[{datetime.now().isoformat()}] ⚠️ Unauthorized command attempt on device: {device_id} by user: {session.get('user_id')}")
+        print(f"[{datetime.now().isoformat()}] ️ Unauthorized command attempt on device: {device_id} by user: {session.get('user_id')}")
         return jsonify({"error": "Unauthorized: You don't have access to this device"}), 403
     
     # Valid commands
@@ -1743,10 +1743,10 @@ def execute_command():
     try:
         # Create pending command for the client to execute
         command_id = store_command(device_id, command, params)
-        print(f"[{datetime.now().isoformat()}] 📤 Command queued: {command} for device {device_id} (ID: {command_id})")
+        print(f"[{datetime.now().isoformat()}]  Command queued: {command} for device {device_id} (ID: {command_id})")
         return jsonify({"status": "success", "message": f"Command {command} sent to device", "command_id": command_id})
     except Exception as e:
-        print(f"[{datetime.now().isoformat()}] ❌ Command execution failed: {str(e)}")
+        print(f"[{datetime.now().isoformat()}]  Command execution failed: {str(e)}")
         return jsonify({"status": "error", "message": str(e)}), 400
 
 @app.route('/api/command/screenshot', methods=['POST'])
@@ -1758,11 +1758,11 @@ def cmd_screenshot():
     
     # Verify access
     if not verify_device_access(device_id):
-        print(f"[{datetime.now().isoformat()}] ⚠️ Unauthorized command attempt on device: {device_id} by user: {session.get('user_id')}")
+        print(f"[{datetime.now().isoformat()}] ️ Unauthorized command attempt on device: {device_id} by user: {session.get('user_id')}")
         return jsonify({"error": "Unauthorized: You don't have access to this device"}), 403
     
     command_id = store_command(device_id, "screenshot")
-    print(f"[{datetime.now().isoformat()}] 📤 Screenshot command queued for device: {device_id} (ID: {command_id})")
+    print(f"[{datetime.now().isoformat()}]  Screenshot command queued for device: {device_id} (ID: {command_id})")
     return jsonify({"status": "queued", "command_id": command_id})
 
 @app.route('/api/command/webcam', methods=['POST'])
@@ -1772,7 +1772,7 @@ def cmd_webcam():
     device_id = data.get('device_id')
     
     command_id = store_command(device_id, "webcam")
-    print(f"[{datetime.now().isoformat()}] 📤 Webcam command queued for device: {device_id} (ID: {command_id})")
+    print(f"[{datetime.now().isoformat()}]  Webcam command queued for device: {device_id} (ID: {command_id})")
     return jsonify({"status": "queued", "command_id": command_id})
 
 @app.route('/api/command/chromehistory', methods=['POST'])
@@ -1782,7 +1782,7 @@ def cmd_chrome_history():
     device_id = data.get('device_id')
     
     command_id = store_command(device_id, "chromehistory")
-    print(f"[{datetime.now().isoformat()}] 📤 Chrome history command queued for device: {device_id} (ID: {command_id})")
+    print(f"[{datetime.now().isoformat()}]  Chrome history command queued for device: {device_id} (ID: {command_id})")
     return jsonify({"status": "queued", "command_id": command_id})
 
 @app.route('/api/command/record', methods=['POST'])
@@ -1793,7 +1793,7 @@ def cmd_record():
     duration = data.get('duration', 10)
     
     command_id = store_command(device_id, "record", {"duration": duration})
-    print(f"[{datetime.now().isoformat()}] 📤 Record command queued for device: {device_id} (ID: {command_id})")
+    print(f"[{datetime.now().isoformat()}]  Record command queued for device: {device_id} (ID: {command_id})")
     return jsonify({"status": "queued", "command_id": command_id})
 
 @app.route('/api/screenshots/<device_id>', methods=['GET'])
@@ -1802,7 +1802,7 @@ def get_screenshots(device_id):
     """Get stored screenshots"""
     # Verify access
     if not verify_device_access(device_id):
-        print(f"[{datetime.now().isoformat()}] ⚠️ Unauthorized access attempt to device: {device_id} by user: {session.get('user_id')}")
+        print(f"[{datetime.now().isoformat()}] ️ Unauthorized access attempt to device: {device_id} by user: {session.get('user_id')}")
         return jsonify({"error": "Unauthorized: You don't have access to this device"}), 403
     
     screenshots = list(screenshots_col.find(
@@ -1821,7 +1821,7 @@ def get_screenshots(device_id):
         ss["_id"] = str(ss["_id"])
         ss["created_at"] = str(ss["created_at"])
     
-    print(f"[{datetime.now().isoformat()}] 📸 Screenshots retrieved for device: {device_id} ({len(screenshots)} images)")
+    print(f"[{datetime.now().isoformat()}]  Screenshots retrieved for device: {device_id} ({len(screenshots)} images)")
     return jsonify(screenshots)
 
 @app.route('/api/commands/pending/<device_id>', methods=['GET'])
@@ -1836,7 +1836,7 @@ def get_pending_commands(device_id):
         cmd["created_at"] = str(cmd["created_at"]) if "created_at" in cmd else str(datetime.now())
     
     if commands:
-        print(f"[{datetime.now().isoformat()}] 📋 {len(commands)} pending command(s) for device: {device_id}")
+        print(f"[{datetime.now().isoformat()}]  {len(commands)} pending command(s) for device: {device_id}")
     
     return jsonify(commands)
 
@@ -1978,7 +1978,7 @@ def cmd_block_website():
         "permanent": data.get('permanent', False)
     })
     
-    result_msg = f"🔒 Blocked {len(validated_websites)} sites: {', '.join(validated_websites[:3])}... on {device_id}"
+    result_msg = f" Blocked {len(validated_websites)} sites: {', '.join(validated_websites[:3])}... on {device_id}"
     store_result(device_id, command_id, result_msg)
     
     return jsonify({
@@ -2020,7 +2020,7 @@ def cmd_unblock_website():
         "force": data.get('force', True)
     })
     
-    result_msg = f"🔓 Unblocked {len(validated_websites)} sites: {', '.join(validated_websites[:3])}... on {device_id}"
+    result_msg = f" Unblocked {len(validated_websites)} sites: {', '.join(validated_websites[:3])}... on {device_id}"
     store_result(device_id, command_id, result_msg)
     
     return jsonify({
@@ -2112,7 +2112,7 @@ def receive_command_result(command_id):
                     "image_base64": result.get("image_base64"),
                     "created_at": datetime.now()
                 })
-                print(f"[{datetime.now().isoformat()}] 📸 Stored {media_type or 'screenshot'} image for device {device_id}")
+                print(f"[{datetime.now().isoformat()}]  Stored {media_type or 'screenshot'} image for device {device_id}")
             if result.get("video_base64"):
                 screenshots_col.insert_one({
                     "device_id": device_id,
@@ -2122,9 +2122,9 @@ def receive_command_result(command_id):
                     "mime_type": result.get("mime_type", "video/mp4"),
                     "created_at": datetime.now()
                 })
-                print(f"[{datetime.now().isoformat()}] 🎬 Stored {media_type or 'record'} video for device {device_id}")
+                print(f"[{datetime.now().isoformat()}]  Stored {media_type or 'record'} video for device {device_id}")
 
-    print(f"[{datetime.now().isoformat()}] ✅ Command result received for {command_id} (device: {device_id})")
+    print(f"[{datetime.now().isoformat()}]  Command result received for {command_id} (device: {device_id})")
     return jsonify({"status": "success"})
 
 @app.route('/api/command/executed/<command_id>', methods=['POST'])
@@ -2144,7 +2144,7 @@ def get_keystrokes(device_id):
     """Get keystrokes for a device"""
     # Verify access
     if not verify_device_access(device_id):
-        print(f"[{datetime.now().isoformat()}] ⚠️ Unauthorized access attempt to device: {device_id} by user: {session.get('user_id')}")
+        print(f"[{datetime.now().isoformat()}] ️ Unauthorized access attempt to device: {device_id} by user: {session.get('user_id')}")
         return jsonify({"error": "Unauthorized: You don't have access to this device"}), 403
     
     keystrokes = list(keystrokes_col.find({"device_id": device_id}).sort("_id", -1).limit(100))
@@ -2164,7 +2164,7 @@ def get_browser_history(device_id):
     """Get browser history for a device"""
     # Verify access
     if not verify_device_access(device_id):
-        print(f"[{datetime.now().isoformat()}] ⚠️ Unauthorized access attempt to device: {device_id} by user: {session.get('user_id')}")
+        print(f"[{datetime.now().isoformat()}] ️ Unauthorized access attempt to device: {device_id} by user: {session.get('user_id')}")
         return jsonify({"error": "Unauthorized: You don't have access to this device"}), 403
 
     history = []
@@ -2198,7 +2198,7 @@ def get_browser_history(device_id):
                         "created_at": str(cmd_doc.get("result_received_at") or cmd_doc.get("created_at", ""))
                     })
 
-    print(f"[{datetime.now().isoformat()}] 📜 Browser history retrieved for device: {device_id} ({len(history)} entries)")
+    print(f"[{datetime.now().isoformat()}]  Browser history retrieved for device: {device_id} ({len(history)} entries)")
     return jsonify(history)
 
 @app.route('/api/media/<device_id>', methods=['GET'])
@@ -2206,7 +2206,7 @@ def get_browser_history(device_id):
 def get_latest_media(device_id):
     """Get latest screenshot/webcam image for a device"""
     if not verify_device_access(device_id):
-        print(f"[{datetime.now().isoformat()}] ⚠️ Unauthorized media access attempt: {device_id} by user: {session.get('user_id')}")
+        print(f"[{datetime.now().isoformat()}] ️ Unauthorized media access attempt: {device_id} by user: {session.get('user_id')}")
         return jsonify({"error": "Unauthorized: You don't have access to this device"}), 403
 
     media_type = request.args.get("type", "screenshot")
@@ -2216,10 +2216,10 @@ def get_latest_media(device_id):
     )
 
     if not doc:
-        print(f"[{datetime.now().isoformat()}] ⚠️ No {media_type} found for device {device_id}")
+        print(f"[{datetime.now().isoformat()}] ️ No {media_type} found for device {device_id}")
         return jsonify({})
 
-    print(f"[{datetime.now().isoformat()}] ✅ Returning {media_type} for device {device_id}")
+    print(f"[{datetime.now().isoformat()}]  Returning {media_type} for device {device_id}")
     return jsonify({
         "image_base64": doc.get("image_base64"),
         "video_base64": doc.get("video_base64"),
@@ -2233,7 +2233,7 @@ def get_latest_media(device_id):
 def get_latest_result(device_id):
     """Get latest result for a command on a device"""
     if not verify_device_access(device_id):
-        print(f"[{datetime.now().isoformat()}] ⚠️ Unauthorized results access attempt: {device_id} by user: {session.get('user_id')}")
+        print(f"[{datetime.now().isoformat()}] ️ Unauthorized results access attempt: {device_id} by user: {session.get('user_id')}")
         return jsonify({"error": "Unauthorized: You don't have access to this device"}), 403
 
     command = request.args.get("command")
@@ -2276,7 +2276,7 @@ def get_time_restrictions(device_id):
             "created_at": str(r.get("created_at", ""))
         })
     
-    print(f"[{datetime.now().isoformat()}] 📋 Time restrictions retrieved for device: {device_id}")
+    print(f"[{datetime.now().isoformat()}]  Time restrictions retrieved for device: {device_id}")
     return jsonify(result)
 
 @app.route('/api/app-usage/<device_id>', methods=['GET'])
@@ -2297,7 +2297,7 @@ def get_app_usage(device_id):
             "category": app.get("category", "Other")
         })
     
-    print(f"[{datetime.now().isoformat()}] 📊 App usage retrieved for device: {device_id} ({len(result)} apps)")
+    print(f"[{datetime.now().isoformat()}]  App usage retrieved for device: {device_id} ({len(result)} apps)")
     return jsonify(result)
 
 @app.route('/api/ai/daily-summary/<device_id>', methods=['GET'])
@@ -2305,7 +2305,7 @@ def get_app_usage(device_id):
 def get_ai_daily_summary(device_id):
     """Generate AI summary of daily activity using Gemini"""
     if not verify_device_access(device_id):
-        print(f"[{datetime.now().isoformat()}] ⚠️ Unauthorized AI summary request for device: {device_id} by user: {session.get('user_id')}")
+        print(f"[{datetime.now().isoformat()}] ️ Unauthorized AI summary request for device: {device_id} by user: {session.get('user_id')}")
         return jsonify({"error": "Unauthorized: You don't have access to this device"}), 403
 
     date_str = request.args.get('date')
@@ -2517,7 +2517,7 @@ def get_ai_daily_summary(device_id):
 
     if AI_PROMPT_LOG:
         print("\n" + "=" * 60)
-        print("🧠 AI SUMMARY PROMPT")
+        print(" AI SUMMARY PROMPT")
         print("=" * 60)
         print(prompt)
         print("=" * 60 + "\n")
@@ -2539,7 +2539,7 @@ def get_ai_daily_summary(device_id):
                     url = f"https://generativelanguage.googleapis.com/v1/models/{model_name}:generateContent"
                     response = requests.post(url, params={"key": GEMINI_API_KEY}, json=payload, timeout=30)
             if not response.ok:
-                print(f"[{datetime.now().isoformat()}] ❌ Gemini API error: {response.status_code} {response.text}")
+                print(f"[{datetime.now().isoformat()}]  Gemini API error: {response.status_code} {response.text}")
                 return jsonify({"error": "Gemini API request failed"}), 502
         data = response.json()
         summary_text = (
@@ -2552,7 +2552,7 @@ def get_ai_daily_summary(device_id):
         if not summary_text:
             return jsonify({"error": "Gemini returned empty summary"}), 502
     except Exception as e:
-        print(f"[{datetime.now().isoformat()}] ❌ Gemini request failed: {str(e)}")
+        print(f"[{datetime.now().isoformat()}]  Gemini request failed: {str(e)}")
         return jsonify({"error": "AI summary generation failed"}), 502
 
     fallback_lines = [
@@ -2701,15 +2701,15 @@ if __name__ == '__main__':
     
     # Startup logging
     print("\n" + "="*60)
-    print("🚀 ParentEye Monitoring System Starting")
+    print(" ParentEye Monitoring System Starting")
     print("="*60)
-    print(f"[{datetime.now().isoformat()}] ✓ MongoDB Atlas connected")
-    print(f"[{datetime.now().isoformat()}] ✓ Database: {DB_NAME}")
-    print(f"[{datetime.now().isoformat()}] ✓ Collections: 6 (parents, devices, commands, results, keystrokes, screenshots)")
-    print(f"[{datetime.now().isoformat()}] 🌐 Server starting on http://0.0.0.0:5000")
-    print(f"[{datetime.now().isoformat()}] 🔐 Admin panel: http://localhost:5000/admin")
-    print(f"[{datetime.now().isoformat()}] 👁️  Parent dashboard: http://localhost:5000/")
-    print(f"[{datetime.now().isoformat()}] 📝 Logging all operations to console with timestamps")
+    print(f"[{datetime.now().isoformat()}]  MongoDB Atlas connected")
+    print(f"[{datetime.now().isoformat()}]  Database: {DB_NAME}")
+    print(f"[{datetime.now().isoformat()}]  Collections: 6 (parents, devices, commands, results, keystrokes, screenshots)")
+    print(f"[{datetime.now().isoformat()}]  Server starting on http://0.0.0.0:5000")
+    print(f"[{datetime.now().isoformat()}]  Admin panel: http://localhost:5000/admin")
+    print(f"[{datetime.now().isoformat()}] ️  Parent dashboard: http://localhost:5000/")
+    print(f"[{datetime.now().isoformat()}]  Logging all operations to console with timestamps")
     print("="*60 + "\n")
 
 if __name__ == '__main__':

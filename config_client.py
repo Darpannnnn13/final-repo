@@ -48,16 +48,16 @@ FLASK_ENV=production
     with open(env_file, 'w', encoding='utf-8') as f:
         f.write(env_content)
     
-    print(f"✅ Configuration file created: {env_file}")
+    print(f" Configuration file created: {env_file}")
     return True
 
 def setup_wizard():
     """Interactive setup wizard"""
     print("\n" + "="*60)
-    print("🚀 ParentEye Client Configuration Setup")
+    print(" ParentEye Client Configuration Setup")
     print("="*60)
     
-    print("\n📝 This setup will configure your client to connect to the backend server.")
+    print("\n This setup will configure your client to connect to the backend server.")
     print("Parents will monitor this PC through the web dashboard.\n")
     
     # Get backend URL
@@ -78,7 +78,7 @@ def setup_wizard():
     if not backend_url.startswith(('http://', 'https://')):
         backend_url = "http://" + backend_url
     
-    print(f"✅ Backend URL set to: {backend_url}")
+    print(f" Backend URL set to: {backend_url}")
     
     # Get MongoDB connection (skip - use cloud default)
     print("\n\nStep 2: Database Configuration")
@@ -87,7 +87,7 @@ def setup_wizard():
     print("This allows data to be stored securely in the cloud.")
     mongodb_uri = "mongodb+srv://darpanmeher1346_db_user:luF1dnvrUsL0ZIUI@main.utpopfr.mongodb.net/?appName=main"
     
-    print(f"✅ Database: MongoDB Atlas (Cloud)")
+    print(f" Database: MongoDB Atlas (Cloud)")
     
     # Create the .env file
     print("\n\nStep 3: Creating Configuration")
@@ -95,20 +95,20 @@ def setup_wizard():
     create_env_file(backend_url, mongodb_uri)
     
     print("\n" + "="*60)
-    print("✅ Configuration Complete!")
+    print(" Configuration Complete!")
     print("="*60)
-    print("\n📋 Summary:")
+    print("\n Summary:")
     print(f"  Backend Server: {backend_url}")
     print("  Database: MongoDB Atlas (Cloud)")
     print("  Config File: .env")
     
-    print("\n🔧 Next Steps:")
+    print("\n Next Steps:")
     print("  1. Run: python run_client_as_admin.bat")
     print("     (This ensures admin privileges for website/app blocking)")
     print("  2. To build EXE: pyinstaller ParentEye_Client.spec")
     print("  3. Distribute the EXE to child PCs")
     
-    print("\n⚠️  IMPORTANT NOTES:")
+    print("\n️  IMPORTANT NOTES:")
     print("  • The backend must be accessible from child PCs")
     print("  • If using a domain, make sure it's configured correctly")
     print("  • Child PCs must be able to reach the backend server")

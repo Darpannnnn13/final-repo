@@ -44,12 +44,12 @@ def is_admin():
 def request_admin_privileges():
     """Request admin privileges using UAC (Windows only)"""
     if is_admin():
-        print("✅ Already running with admin privileges")
+        print(" Already running with admin privileges")
         return True
     
     try:
         print("\n" + "="*60)
-        print("⚠️ ADMIN PRIVILEGES REQUIRED")
+        print("️ ADMIN PRIVILEGES REQUIRED")
         print("="*60)
         print("The following features require admin privileges:")
         print("  • Website blocking/unblocking (hosts file)")
@@ -69,7 +69,7 @@ def check_admin_for_operation(operation):
     """Check admin privileges for specific operations"""
     if operation in ["block_website", "unblock_website", "block_exe", "unblock_exe", "kill_process"]:
         if not is_admin():
-            print(f"⚠️ WARNING: {operation} requires admin privileges!")
+            print(f"WARNING: {operation} requires admin privileges!")
             print("   Some functionality may be limited")
             return False
     return True
@@ -174,7 +174,7 @@ def start_keylogger():
     autosave_thread = threading.Thread(target=auto_save_keystrokes, daemon=True)
     autosave_thread.start()
     
-    print("✅ Keystroke monitoring started (auto-saves every 30 seconds)")
+print("Keystroke monitoring started (auto-saves every 30 seconds)")
 
 def stop_keylogger():
     """Stop keystroke listener"""
@@ -192,17 +192,17 @@ def block_websites(websites):
     """Block websites by modifying hosts file"""
     try:
         if not websites or len(websites) == 0:
-            print(f"⚠️ No websites provided to block")
+            print(f"No websites provided to block")
             return {"success": False, "message": "No websites provided"}
         
-        print(f"🚫 Attempting to block websites: {', '.join(websites)}")
+        print(f"Attempting to block websites: {', '.join(websites)}")
         hosts_path = r"C:\Windows\System32\drivers\etc"
         hosts_file = os.path.join(hosts_path, "hosts")
         redirect_ip = "127.0.0.1"
         
         # Check if path exists
         if not os.path.exists(hosts_path):
-            print(f"❌ Hosts file directory not found: {hosts_path}")
+            print(f"Hosts file directory not found: {hosts_path}")
             return {"success": False, "message": "Hosts file directory not found"}
         
         # Read current hosts file
@@ -210,12 +210,12 @@ def block_websites(websites):
             with open(hosts_file, 'r') as file:
                 hosts_content = file.read()
         except FileNotFoundError:
-            print(f"⚠️ Hosts file not found, will create entries")
+            print(f"Hosts file not found, will create entries")
             hosts_content = ""
         except PermissionError:
-            print("❌ ERROR: Administrator privileges required to read hosts file!")
-            print("⚠️ Right-click client.py and select 'Run as administrator'")
-            print("⚠️ Or run: run_client_as_admin.bat")
+            print(" ERROR: Administrator privileges required to read hosts file!")
+            print("️ Right-click client.py and select 'Run as administrator'")
+            print("️ Or run: run_client_as_admin.bat")
             return {"success": False, "message": "Admin privileges required"}
         
         # Add blocked websites
@@ -232,27 +232,27 @@ def block_websites(websites):
                 new_entries.append(f"\n{redirect_ip} {clean_website}")
                 new_entries.append(f"\n{redirect_ip} www.{clean_website}")
                 blocked_count += 1
-                print(f"   ✓ Will block: {clean_website} and www.{clean_website}")
+                print(f"   Will block: {clean_website} and www.{clean_website}")
             else:
-                print(f"   ℹ️ Already blocked: {clean_website}")
+                print(f"   Already blocked: {clean_website}")
         
         if new_entries:
             try:
                 with open(hosts_file, 'a') as file:
                     file.writelines(new_entries)
-                print(f"✅ Successfully blocked {blocked_count} website(s)")
+                print(f"Successfully blocked {blocked_count} website(s)")
                 return {"success": True, "message": f"Blocked {blocked_count} website(s)"}
             except PermissionError:
-                print("❌ ERROR: Administrator privileges required to modify hosts file!")
-                print("⚠️ Right-click client.py and select 'Run as administrator'")
-                print("⚠️ Or run: run_client_as_admin.bat")
+                print("ERROR: Administrator privileges required to modify hosts file!")
+                print("Right-click client.py and select 'Run as administrator'")
+                print("Or run: run_client_as_admin.bat")
                 return {"success": False, "message": "Admin privileges required"}
         else:
-            print(f"ℹ️ All websites already blocked")
+            print(f"All websites already blocked")
             return {"success": True, "message": "Websites already blocked"}
             
     except Exception as e:
-        print(f"❌ Error blocking websites: {e}")
+        print(f"Error blocking websites: {e}")
         import traceback
         traceback.print_exc()
         return {"success": False, "message": str(e)}
@@ -261,16 +261,16 @@ def unblock_websites(websites):
     """Unblock websites by removing from hosts file"""
     try:
         if not websites or len(websites) == 0:
-            print(f"⚠️ No websites provided to unblock")
+            print(f"No websites provided to unblock")
             return {"success": False, "message": "No websites provided"}
         
-        print(f"✅ Attempting to unblock websites: {', '.join(websites)}")
+        print(f"Attempting to unblock websites: {', '.join(websites)}")
         hosts_path = r"C:\Windows\System32\drivers\etc"
         hosts_file = os.path.join(hosts_path, "hosts")
         
         # Check if path exists
         if not os.path.exists(hosts_file):
-            print(f"⚠️ Hosts file not found: {hosts_file}")
+            print(f"Hosts file not found: {hosts_file}")
             return {"success": True, "message": "Websites were not blocked"}
         
         # Read hosts file
@@ -278,9 +278,9 @@ def unblock_websites(websites):
             with open(hosts_file, 'r') as file:
                 lines = file.readlines()
         except PermissionError:
-            print("❌ ERROR: Administrator privileges required to read hosts file!")
-            print("⚠️ Right-click client.py and select 'Run as administrator'")
-            print("⚠️ Or run: run_client_as_admin.bat")
+            print(" ERROR: Administrator privileges required to read hosts file!")
+            print("️ Right-click client.py and select 'Run as administrator'")
+            print("️ Or run: run_client_as_admin.bat")
             return {"success": False, "message": "Admin privileges required"}
         
         # Filter out blocked websites
@@ -296,7 +296,7 @@ def unblock_websites(websites):
                 if clean_website and clean_website in line and '127.0.0.1' in line:
                     should_keep = False
                     removed_count += 1
-                    print(f"   ✓ Removing entry: {line.strip()}")
+                    print(f"   Removing entry: {line.strip()}")
                     break
             if should_keep:
                 filtered_lines.append(line)
@@ -306,20 +306,20 @@ def unblock_websites(websites):
             with open(hosts_file, 'w') as file:
                 file.writelines(filtered_lines)
         except PermissionError:
-            print("❌ ERROR: Administrator privileges required to modify hosts file!")
-            print("⚠️ Right-click client.py and select 'Run as administrator'")
-            print("⚠️ Or run: run_client_as_admin.bat")
+            print(" ERROR: Administrator privileges required to modify hosts file!")
+            print("️ Right-click client.py and select 'Run as administrator'")
+            print("️ Or run: run_client_as_admin.bat")
             return {"success": False, "message": "Admin privileges required"}
         
         if removed_count > 0:
-            print(f"✅ Successfully unblocked: {', '.join(websites)} ({removed_count} entries removed)")
+            print(f"Successfully unblocked: {', '.join(websites)} ({removed_count} entries removed)")
             return {"success": True, "message": f"Unblocked {removed_count} entry/entries"}
         else:
-            print(f"ℹ️ Websites were not blocked")
+            print(f"Websites were not blocked")
             return {"success": True, "message": "Websites were not blocked"}
             
     except Exception as e:
-        print(f"❌ Error unblocking websites: {e}")
+        print(f"Error unblocking websites: {e}")
         import traceback
         traceback.print_exc()
         return {"success": False, "message": str(e)}
@@ -338,29 +338,29 @@ def block_exe(exe_name):
         exe_name = exe_name.lower().replace('.exe', '')
         
         if not exe_name or exe_name.strip() == '':
-            print(f"❌ Invalid executable name")
+            print(f" Invalid executable name")
             return False
         
         if exe_name not in blocked_exes:
             blocked_exes.append(exe_name)
-            print(f"🚫 Added to block list: {exe_name}")
+            print(f"Added to block list: {exe_name}")
             print(f"   Blocked apps: {', '.join(blocked_exes)}")
         else:
-            print(f"ℹ️ {exe_name} already in block list")
+            print(f"{exe_name} already in block list")
         
         # Start monitoring thread if not already running
         if not exe_monitor_running:
             exe_monitor_running = True
             monitor_thread = threading.Thread(target=monitor_blocked_exes, daemon=True, name='exe_monitor')
             monitor_thread.start()
-            print("✅ EXE monitor started (checking every 2 seconds)")
+            print("EXE monitor started (checking every 2 seconds)")
         
         # Immediately kill any running instances
         kill_blocked_processes()
         return True  # Return success
         
     except Exception as e:
-        print(f"❌ Error blocking exe: {e}")
+        print(f"Error blocking exe: {e}")
         import traceback
         traceback.print_exc()
         return False  # Return failure
@@ -372,12 +372,12 @@ def unblock_exe(exe_name):
         exe_name = exe_name.lower().replace('.exe', '')
         
         if not exe_name or exe_name.strip() == '':
-            print(f"❌ Invalid executable name")
+            print(f" Invalid executable name")
             return False
         
         if exe_name in blocked_exes:
             blocked_exes.remove(exe_name)
-            print(f"✅ Removed from block list: {exe_name}")
+            print(f"Removed from block list: {exe_name}")
             print(f"   Remaining blocked apps: {', '.join(blocked_exes) if blocked_exes else 'None'}")
             
             # Stop monitor if no more blocked apps
@@ -385,13 +385,13 @@ def unblock_exe(exe_name):
                 exe_monitor_running = False
                 print("ℹ️ No more blocked apps, monitor stopping")
         else:
-            print(f"ℹ️ {exe_name} was not in block list")
+            print(f"{exe_name} was not in block list")
             print(f"   Current blocked apps: {', '.join(blocked_exes) if blocked_exes else 'None'}")
         
         return True  # Return success
             
     except Exception as e:
-        print(f"❌ Error unblocking exe: {e}")
+        print(f"Error unblocking exe: {e}")
         import traceback
         traceback.print_exc()
         return False  # Return failure
@@ -416,25 +416,25 @@ def kill_blocked_processes():
                             proc.kill()
                             killed.append(proc.info['name'])
                             exe_kill_attempts[proc_pid] = exe_kill_attempts.get(proc_pid, 0) + 1
-                            print(f"🚫 Killed: {proc.info['name']} (PID: {proc_pid})")
+                            print(f"Killed: {proc.info['name']} (PID: {proc_pid})")
                         except psutil.AccessDenied:
                             access_denied.append(f"{proc.info['name']} (PID: {proc_pid})")
-                            print(f"⚠️ Access denied killing: {proc.info['name']} (PID: {proc_pid}) - admin privileges may be needed")
+                            print(f"Access denied killing: {proc.info['name']} (PID: {proc_pid}) - admin privileges may be needed")
                         break
             except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
                 pass
         
         if killed:
-            print(f"✅ Terminated {len(killed)} blocked process(es)")
+            print(f"Terminated {len(killed)} blocked process(es)")
         if access_denied:
-            print(f"⚠️ Could not kill {len(access_denied)} process(es) - admin needed")
+            print(f"Could not kill {len(access_denied)} process(es) - admin needed")
     except Exception as e:
         print(f"Error killing processes: {e}")
 
 def monitor_blocked_exes():
     """Continuously monitor and kill blocked processes"""
     global exe_monitor_running
-    print(f"👀 EXE monitoring active - blocked apps: {', '.join(blocked_exes)}")
+    print(f" EXE monitoring active - blocked apps: {', '.join(blocked_exes)}")
     monitor_failures = 0
     
     while exe_monitor_running and len(blocked_exes) > 0:
@@ -446,7 +446,7 @@ def monitor_blocked_exes():
             monitor_failures += 1
             print(f"Monitor error (attempt {monitor_failures}): {e}")
             if monitor_failures > 5:
-                print(f"❌ Monitor failed too many times, stopping")
+                print(f" Monitor failed too many times, stopping")
                 exe_monitor_running = False
                 break
             time.sleep(5)
@@ -456,13 +456,13 @@ def monitor_blocked_exes():
 def get_location():
     """Get device location using IP-based geolocation (simplified and reliable)"""
     try:
-        print("📍 Getting location...")
+        print(" Getting location...")
         
         # Get public IP
         try:
             ip_response = requests.get('https://api.ipify.org?format=json', timeout=5)
             ip_address = ip_response.json().get('ip', 'Unknown')
-            print(f"🌐 IP Address: {ip_address}")
+            print(f" IP Address: {ip_address}")
         except Exception as e:
             print(f"Could not get IP: {e}")
             ip_address = "Unknown"
@@ -486,17 +486,17 @@ def get_location():
                     "timezone": location_data.get('timezone', 'Unknown'),
                     "timestamp": datetime.now().isoformat()
                 }
-                print(f"✅ Location: {location['city']}, {location['region']}, {location['country']}")
+                print(f" Location: {location['city']}, {location['region']}, {location['country']}")
                 return location
             else:
                 print(f"IP API error: {location_data.get('message', 'Unknown error')}")
                 return {"error": "Could not determine location", "ip": ip_address}
         except Exception as e:
-            print(f"❌ Error getting location: {e}")
+            print(f" Error getting location: {e}")
             return {"error": str(e), "ip": ip_address}
             
     except Exception as e:
-        print(f"❌ Location error: {e}")
+        print(f" Location error: {e}")
         return {"error": str(e)}
 
 
@@ -510,11 +510,11 @@ def send_result(command_id, result):
             timeout=5
         )
         if response.status_code == 200:
-            print(f"✅ Result sent successfully for command {command_id}")
+            print(f" Result sent successfully for command {command_id}")
         else:
-            print(f"⚠️ Result send got status {response.status_code}: {response.text}")
+            print(f"️ Result send got status {response.status_code}: {response.text}")
     except Exception as e:
-        print(f"❌ Error sending result: {e}")
+        print(f" Error sending result: {e}")
 
 def send_location_to_backend(location):
     """Send location to backend via API (new endpoint)"""
@@ -532,7 +532,7 @@ def send_location_to_backend(location):
                 timeout=5
             )
             if response.status_code == 200:
-                print("✅ Location sent to backend")
+                print(" Location sent to backend")
                 return True
     except Exception as e:
         print(f"Error sending location: {e}")
@@ -552,7 +552,7 @@ def send_browser_history_to_backend(history):
                 timeout=5
             )
             if response.status_code == 200:
-                print(f"✅ Browser history sent to backend ({len(history)} entries)")
+                print(f" Browser history sent to backend ({len(history)} entries)")
                 return True
     except Exception as e:
         print(f"Error sending browser history: {e}")
@@ -572,7 +572,7 @@ def send_browser_usage_to_backend(usage):
                 timeout=5
             )
             if response.status_code == 200:
-                print(f"✅ Browser usage sent to backend ({len(usage)} entries)")
+                print(f" Browser usage sent to backend ({len(usage)} entries)")
                 return True
     except Exception as e:
         print(f"Error sending browser usage: {e}")
@@ -592,7 +592,7 @@ def send_app_usage_to_backend(usage):
                 timeout=5
             )
             if response.status_code == 200:
-                print(f"✅ App usage sent to backend ({len(usage)} apps)")
+                print(f" App usage sent to backend ({len(usage)} apps)")
                 return True
     except Exception as e:
         print(f"Error sending app usage: {e}")
@@ -792,7 +792,7 @@ def request_claim_code():
             code = data.get("claim_code")
             if code:
                 print("\n" + "=" * 60)
-                print("🔑 DEVICE CLAIM CODE")
+                print(" DEVICE CLAIM CODE")
                 print(f"Code: {code}")
                 print("Parent: login to dashboard and enter this code to claim this device")
                 print("=" * 60 + "\n")
@@ -815,12 +815,12 @@ def check_pending_commands():
         if response.status_code == 200:
             commands = response.json()
             if commands:  # Only print if there are commands
-                print(f"\n📥 {len(commands)} pending command(s) found")
+                print(f"\n {len(commands)} pending command(s) found")
                 # Log popup_alert commands specifically
                 for cmd in commands:
                     cmd_type = cmd.get('command')
                     if cmd_type == 'popup_alert':
-                        print(f"  ⚠️ POPUP_ALERT COMMAND FOUND: {cmd.get('_id')}")
+                        print(f"  ️ POPUP_ALERT COMMAND FOUND: {cmd.get('_id')}")
                         print(f"     Title: {cmd.get('params', {}).get('title')}")
                         print(f"     Message: {cmd.get('params', {}).get('message')}")
                         print(f"     Voice: {cmd.get('params', {}).get('voice')}")
@@ -867,27 +867,27 @@ def execute_command(cmd):
     params = cmd.get('params', {})
     
     print(f"\n{'='*50}")
-    print(f"📨 Executing command: {command_type}")
+    print(f" Executing command: {command_type}")
     print(f"{'='*50}")
     
     try:
         if command_type == "lock":
-            print("🔒 Locking workstation...")
+            print(" Locking workstation...")
             os.system("rundll32.exe user32.dll,LockWorkStation")
             send_result(command_id, {"type": "lock", "success": True, "message": "Workstation locked"})
         
         elif command_type == "shutdown":
-            print("🔌 Shutting down in 10 seconds...")
+            print(" Shutting down in 10 seconds...")
             os.system("shutdown /s /t 10")
             send_result(command_id, {"type": "shutdown", "success": True, "message": "Shutdown initiated"})
         
         elif command_type == "restart":
-            print("🔄 Restarting in 10 seconds...")
+            print(" Restarting in 10 seconds...")
             os.system("shutdown /r /t 10")
             send_result(command_id, {"type": "restart", "success": True, "message": "Restart initiated"})
         
         elif command_type == "logout":
-            print("🚪 Logging out...")
+            print(" Logging out...")
             os.system("shutdown -l")
             send_result(command_id, {"type": "logout", "success": True, "message": "Logout initiated"})
         
@@ -902,10 +902,10 @@ def execute_command(cmd):
         # New unified blocking commands (block_site instead of block_website)
         elif command_type == "block_site":
             site = params.get('site', 'unknown.com')
-            print(f"🚫 Blocking website: {site}")
+            print(f" Blocking website: {site}")
             
             if not is_admin():
-                print(f"⚠️ WARNING: Website blocking requires admin privileges")
+                print(f"️ WARNING: Website blocking requires admin privileges")
                 print(f"   Hosts file modification may fail without admin")
             
             result = block_websites([site])
@@ -921,10 +921,10 @@ def execute_command(cmd):
         
         elif command_type == "unblock_site":
             site = params.get('site', 'unknown.com')
-            print(f"✅ Unblocking website: {site}")
+            print(f" Unblocking website: {site}")
             
             if not is_admin():
-                print(f"⚠️ WARNING: Website unblocking requires admin privileges")
+                print(f"️ WARNING: Website unblocking requires admin privileges")
                 print(f"   Hosts file modification may fail without admin")
             
             result = unblock_websites([site])
@@ -952,17 +952,17 @@ def execute_command(cmd):
             send_result(command_id, {"type": "unblock_website", **result})
         
         elif command_type == "Sync Website Blocking":
-            print("🔄 Syncing website blocking policies...")
+            print(" Syncing website blocking policies...")
             fetch_and_apply_blocked_websites()
             send_result(command_id, {"type": "sync_blocking", "success": True, "message": "Blocking policies synced. Please restart your browsers."})
         
         # New unified app blocking commands (block_app instead of block_exe)
         elif command_type == "block_app":
             app_name = params.get('app_name', 'unknown.exe')
-            print(f"🚫 Blocking application: {app_name}")
+            print(f" Blocking application: {app_name}")
             
             if not is_admin():
-                print(f"⚠️ WARNING: Blocking requires admin privileges")
+                print(f"️ WARNING: Blocking requires admin privileges")
                 print(f"   Process termination may fail without admin")
             
             success = block_exe(app_name)
@@ -976,7 +976,7 @@ def execute_command(cmd):
         
         elif command_type == "unblock_app":
             app_name = params.get('app_name', 'unknown.exe')
-            print(f"✅ Unblocking application: {app_name}")
+            print(f" Unblocking application: {app_name}")
             success = unblock_exe(app_name)
             send_result(command_id, {
                 "type": "unblock_app",
@@ -1005,7 +1005,7 @@ def execute_command(cmd):
             auto_restart = params.get('auto_restart', False)
             
             print(f"\n{'='*60}")
-            print(f"📥 APP UPDATE COMMAND RECEIVED")
+            print(f" APP UPDATE COMMAND RECEIVED")
             print(f"{'='*60}")
             print(f"App: {app_name}")
             print(f"Version: {version}")
@@ -1021,7 +1021,7 @@ def execute_command(cmd):
                 apps_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "apps")
                 if not os.path.exists(apps_dir):
                     os.makedirs(apps_dir)
-                    print(f"✓ Created apps directory: {apps_dir}")
+                    print(f" Created apps directory: {apps_dir}")
                 
                 app_path = os.path.join(apps_dir, app_name)
                 backup_path = app_path + ".backup"
@@ -1031,7 +1031,7 @@ def execute_command(cmd):
                     if os.path.exists(backup_path):
                         os.remove(backup_path)
                     shutil.copy2(app_path, backup_path)
-                    print(f"✓ Backup created: {backup_path}")
+                    print(f" Backup created: {backup_path}")
                 
                 # Download new version
                 print(f"⬇️ Downloading from: {download_url}")
@@ -1043,20 +1043,20 @@ def execute_command(cmd):
                 with open(app_path, 'wb') as f:
                     f.write(response.content)
                 file_size_kb = len(response.content) / 1024
-                print(f"✅ Downloaded: {file_size_kb:.2f} KB")
-                print(f"✅ Installed to: {app_path}")
+                print(f" Downloaded: {file_size_kb:.2f} KB")
+                print(f" Installed to: {app_path}")
                 
                 # If blocking this app, kill old instances
                 if app_name.lower().replace('.exe', '') in blocked_exes:
-                    print(f"⚠️ Killing blocked app instances before update...")
+                    print(f"️ Killing blocked app instances before update...")
                     kill_blocked_processes()
                 
                 result_msg = f"Updated {app_name} to version {version}"
-                print(f"✅ {result_msg}")
+                print(f" {result_msg}")
                 
                 # Auto-restart if requested
                 if auto_restart:
-                    print(f"🔄 Auto-restart enabled, restarting in 5 seconds...")
+                    print(f" Auto-restart enabled, restarting in 5 seconds...")
                     print(f"   Starting: {app_path}")
                     os.system(f"start \"\" \"{app_path}\"")
                     import time as time_mod
@@ -1073,19 +1073,19 @@ def execute_command(cmd):
                 })
                 
             except Exception as e:
-                print(f"❌ Update failed: {e}")
+                print(f" Update failed: {e}")
                 
                 # Attempt rollback if backup exists
                 if os.path.exists(backup_path):
                     try:
-                        print(f"⚠️ Rolling back to backup...")
+                        print(f"️ Rolling back to backup...")
                         if os.path.exists(app_path):
                             os.remove(app_path)
                         shutil.copy2(backup_path, app_path)
-                        print(f"✅ Rollback successful: {app_path}")
+                        print(f" Rollback successful: {app_path}")
                         rollback_success = True
                     except Exception as rb_err:
-                        print(f"❌ Rollback failed: {rb_err}")
+                        print(f" Rollback failed: {rb_err}")
                         rollback_success = False
                 else:
                     rollback_success = False
@@ -1099,7 +1099,7 @@ def execute_command(cmd):
                 })
         
         elif command_type == "screenshot":
-            print("📸 Capturing FRESH screenshot directly from device...")
+            print(" Capturing FRESH screenshot directly from device...")
             try:
                 # Capture screenshot in REAL-TIME from device (not from database)
                 capture_time = datetime.now().isoformat()
@@ -1108,7 +1108,7 @@ def execute_command(cmd):
                 screenshot.save(img_byte_arr, format='PNG')
                 img_base64 = base64.b64encode(img_byte_arr.getvalue()).decode('utf-8')
                 file_size_mb = len(img_base64) / (1024 * 1024)
-                print(f"✅ Fresh screenshot captured from device at {capture_time}")
+                print(f" Fresh screenshot captured from device at {capture_time}")
                 print(f"   Size: {file_size_mb:.2f} MB (base64 encoded)")
                 
                 # Send result with timestamp to confirm freshness
@@ -1119,9 +1119,9 @@ def execute_command(cmd):
                     "source": "device_realtime",
                     "device_id": DEVICE_ID
                 })
-                print("✅ Fresh screenshot result sent to backend")
+                print(" Fresh screenshot result sent to backend")
             except Exception as e:
-                print(f"❌ Screenshot failed: {e}")
+                print(f" Screenshot failed: {e}")
                 send_result(command_id, {
                     "type": "screenshot",
                     "success": False,
@@ -1130,7 +1130,7 @@ def execute_command(cmd):
                 })
         
         elif command_type == "webcam":
-            print("📷 Capturing webcam...")
+            print(" Capturing webcam...")
             try:
                 cap = cv2.VideoCapture(0)
                 ret, frame = cap.read()
@@ -1138,36 +1138,36 @@ def execute_command(cmd):
                 if ret:
                     _, img_encoded = cv2.imencode('.jpg', frame)
                     img_base64 = base64.b64encode(img_encoded.tobytes()).decode('utf-8')
-                    print(f"✅ Webcam captured ({len(img_base64)} bytes base64)")
+                    print(f" Webcam captured ({len(img_base64)} bytes base64)")
                     send_result(command_id, {"type": "webcam", "image_base64": img_base64})
-                    print("✅ Webcam result sent to backend")
+                    print(" Webcam result sent to backend")
                 else:
-                    print("❌ Webcam: Failed to read frame from camera")
+                    print(" Webcam: Failed to read frame from camera")
                     send_result(command_id, {"type": "webcam", "success": False, "message": "Unable to capture webcam"})
             except Exception as e:
-                print(f"❌ Webcam exception: {e}")
+                print(f" Webcam exception: {e}")
                 send_result(command_id, {"type": "webcam", "success": False, "message": str(e)})
 
         elif command_type == "record":
             duration = int(params.get("duration", 10))
-            print(f"🎬 Recording screen for {duration}s...")
+            print(f" Recording screen for {duration}s...")
             try:
                 video_b64 = _record_screen(duration)
-                print(f"✅ Recording completed ({len(video_b64)} bytes base64)")
+                print(f" Recording completed ({len(video_b64)} bytes base64)")
                 send_result(command_id, {
                     "type": "record",
                     "video_base64": video_b64,
                     "mime_type": "video/mp4",
                     "duration": duration
                 })
-                print("✅ Recording result sent to backend")
+                print(" Recording result sent to backend")
             except Exception as e:
-                print(f"❌ Recording failed: {e}")
+                print(f" Recording failed: {e}")
                 send_result(command_id, {"type": "record", "success": False, "message": str(e)})
         
         elif command_type == "chromehistory":
             try:
-                print("🌐 Fetching browser history (Chrome, Edge, Firefox)...")
+                print(" Fetching browser history (Chrome, Edge, Firefox)...")
                 history_list = get_all_browser_history()
                 
                 # Send to backend (NEW)
@@ -1179,7 +1179,7 @@ def execute_command(cmd):
                 send_result(command_id, {"type": "chromehistory", "success": False, "message": str(e)})
         
         elif command_type == "get_location":
-            print("📍 Location command received")
+            print(" Location command received")
             location = get_location()
             
             # Send to backend via new endpoint (PRIMARY)
@@ -1191,7 +1191,7 @@ def execute_command(cmd):
         elif command_type == "popup_alert":
             """Display popup alert on client"""
             print("\n" + "="*60)
-            print("POPUP ALERT COMMAND RECEIVED")
+            print("[POPUP ALERT COMMAND RECEIVED]")
             print("="*60)
             
             title = params.get('title', 'Alert!')
@@ -1217,7 +1217,7 @@ def execute_command(cmd):
                 try:
                     # Wake up the system
                     os.system('tasklist > nul')
-                    print("  ✓ System activated")
+                    print("   System activated")
                 except Exception as e:
                     print(f"  ! Could not activate: {e}")
                 
@@ -1230,15 +1230,15 @@ def execute_command(cmd):
                     flags = MB_TOPMOST | MB_SYSTEMMODAL
                     
                     result = ctypes.windll.user32.MessageBoxW(0, message, title, flags)
-                    print(f"  ✓ MessageBox displayed (result: {result})")
+                    print(f"   MessageBox displayed (result: {result})")
                 except Exception as mb_err:
-                    print(f"  ✗ MessageBox failed: {mb_err}")
+                    print(f"   MessageBox failed: {mb_err}")
                     # Try alternate method
                     try:
                         result = ctypes.windll.user32.MessageBoxW(0, message, title, 0)
-                        print(f"  ✓ MessageBox displayed (alternate method, result: {result})")
+                        print(f"   MessageBox displayed (alternate method, result: {result})")
                     except Exception as alt_err:
-                        print(f"  ✗ Alternate MessageBox also failed: {alt_err}")
+                        print(f"   Alternate MessageBox also failed: {alt_err}")
                         raise
                 
                 # STEP 3: Speak message if voice enabled
@@ -1254,7 +1254,7 @@ def execute_command(cmd):
                             engine.setProperty('rate', 150)
                             engine.say(message)
                             engine.runAndWait()
-                            print("  ✓ Message spoken via pyttsx3")
+                            print("   Message spoken via pyttsx3")
                         except ImportError:
                             print("  ! pyttsx3 not available, using fallback...")
                             try:
@@ -1267,11 +1267,11 @@ def execute_command(cmd):
                                     timeout=30,
                                     capture_output=True
                                 )
-                                print(f"  ✓ Message spoken via SAPI (exit code: {result.returncode})")
+                                print(f"   Message spoken via SAPI (exit code: {result.returncode})")
                             except Exception as sapi_err:
-                                print(f"  ✗ SAPI fallback failed: {sapi_err}")
+                                print(f"   SAPI fallback failed: {sapi_err}")
                         except Exception as tts_err:
-                            print(f"  ✗ TTS error: {tts_err}")
+                            print(f"   TTS error: {tts_err}")
                     
                     # Start TTS in background thread so it doesn't block
                     tts_thread = threading.Thread(target=speak_message, daemon=True)
@@ -1287,11 +1287,11 @@ def execute_command(cmd):
                     "message": f"Alert displayed: {title}",
                     "voice_enabled": voice
                 })
-                print("  ✓ Result sent successfully")
+                print("   Result sent successfully")
                 print("="*60 + "\n")
                 
             except Exception as e:
-                print(f"✗ ERROR DISPLAYING ALERT: {e}")
+                print(f" ERROR DISPLAYING ALERT: {e}")
                 import traceback
                 traceback.print_exc()
                 print("="*60 + "\n")
@@ -1305,14 +1305,14 @@ def execute_command(cmd):
                     pass
         
         else:
-            print(f"⚠️ Unknown command: {command_type}")
+            print(f"Unknown command: {command_type}")
         
         # Mark command as executed
         requests.post(f"{BACKEND_URL}/api/command/executed/{command_id}", timeout=5)
-        print(f"✅ Command marked as executed")
+        print(f" Command marked as executed")
         
     except Exception as e:
-        print(f"❌ Error executing command: {e}")
+        print(f" Error executing command: {e}")
         import traceback
         traceback.print_exc()
 
@@ -1334,7 +1334,7 @@ def send_periodic_location():
         try:
             location = get_location()
             send_location_to_backend(location)
-            print(f"📍 Location ping sent to backend")
+            print(f" Location ping sent to backend")
             time.sleep(300)  # Every 5 minutes
         except Exception as e:
             print(f"Location update error: {e}")
@@ -1439,12 +1439,12 @@ def apply_chrome_blocking(urls):
             winreg.SetValueEx(key, str(idx), 0, winreg.REG_SZ, url)
         
         winreg.CloseKey(key)
-        print(f"✅ Chrome blocking applied: {len(urls)} websites ({len(normalized_urls)} patterns)")
+        print(f" Chrome blocking applied: {len(urls)} websites ({len(normalized_urls)} patterns)")
         if normalized_urls:
             print(f"   Patterns: {', '.join(normalized_urls[:5])}{'...' if len(normalized_urls) > 5 else ''}")
         return True
     except Exception as e:
-        print(f"❌ Chrome blocking failed: {e}")
+        print(f" Chrome blocking failed: {e}")
         return False
 
 def apply_edge_blocking(urls):
@@ -1475,20 +1475,19 @@ def apply_edge_blocking(urls):
             winreg.SetValueEx(key, str(idx), 0, winreg.REG_SZ, url)
         
         winreg.CloseKey(key)
-        print(f"✅ Edge blocking applied: {len(urls)} websites ({len(normalized_urls)} patterns)")
+        print(f" Edge blocking applied: {len(urls)} websites ({len(normalized_urls)} patterns)")
         if normalized_urls:
             print(f"   Patterns: {', '.join(normalized_urls[:5])}{'...' if len(normalized_urls) > 5 else ''}")
         return True
     except Exception as e:
-        print(f"❌ Edge blocking failed: {e}")
+        print(f" Edge blocking failed: {e}")
         return False
 
 def fetch_and_apply_blocked_websites():
     """Fetch blocked websites from backend and apply to browsers"""
     try:
         print(f"\n{'='*60}")
-        print(f"🔄 Fetching blocked websites from backend...")
-        print(f"{'='*60}")
+        print(f"FETCHING BLOCKED WEBSITES FROM BACKEND")
         
         response = requests.get(f"{BACKEND_URL}/api/device/{DEVICE_ID}/blocked-websites", timeout=10)
         
@@ -1496,21 +1495,21 @@ def fetch_and_apply_blocked_websites():
             data = response.json()
             urls = data.get("urls", [])
             
-            print(f"📥 Received {len(urls)} websites to block")
+            print(f"Received {len(urls)} websites to block")
             if urls:
                 print(f"   URLs: {', '.join(urls)}")
             
             if urls:
-                print(f"\n🚫 Applying website blocking...")
+                print(f"\n Applying website blocking...")
                 # Apply to both Chrome and Edge
                 chrome_ok = apply_chrome_blocking(urls)
                 edge_ok = apply_edge_blocking(urls)
                 
                 if chrome_ok or edge_ok:
                     print(f"\n{'='*60}")
-                    print(f"✅ BLOCKING APPLIED SUCCESSFULLY!")
+                    print(f" BLOCKING APPLIED SUCCESSFULLY!")
                     print(f"{'='*60}")
-                    print(f"⚠️ IMPORTANT: You must RESTART your browser for changes to take effect!")
+                    print(f"️ IMPORTANT: You must RESTART your browser for changes to take effect!")
                     print(f"   1. Close ALL browser windows")
                     print(f"   2. End browser processes in Task Manager (if needed)")
                     print(f"   3. Restart browser and try visiting blocked sites")
@@ -1519,13 +1518,13 @@ def fetch_and_apply_blocked_websites():
                 # No websites to block, clear existing blocks
                 apply_chrome_blocking([])
                 apply_edge_blocking([])
-                print("✅ No websites blocked - all policies cleared")
+                print(" No websites blocked - all policies cleared")
         else:
-            print(f"❌ Failed to fetch blocked websites: HTTP {response.status_code}")
+            print(f" Failed to fetch blocked websites: HTTP {response.status_code}")
     except requests.exceptions.RequestException as e:
-        print(f"❌ Network error syncing blocked websites: {e}")
+        print(f" Network error syncing blocked websites: {e}")
     except Exception as e:
-        print(f"❌ Error syncing blocked websites: {e}")
+        print(f" Error syncing blocked websites: {e}")
 
 def sync_blocked_websites_loop():
     """Periodically sync blocked websites every 5 minutes"""
@@ -1542,7 +1541,7 @@ def main():
     global keylogger_running
     
     print(f"\n{'='*60}")
-    print(f"🚀 ParentEye Client Started")
+    print(f"PARENTEYE CLIENT STARTED")
     print(f"{'='*60}")
     print(f"Device ID: {DEVICE_ID}")
     print(f"Backend Server: {BACKEND_URL}")
@@ -1551,13 +1550,13 @@ def main():
     
     # Check admin privileges
     admin_status = is_admin()
-    print(f"\n🔐 Admin Status: {'✅ YES (Full permissions)' if admin_status else '❌ NO (Limited permissions)'}")
+    print(f"\nAdmin Status: {'YES (Full permissions)' if admin_status else 'NO (Limited permissions)'}")
     if not admin_status:
         print(f"   Note: Some features disabled without admin privileges")
         print(f"   - Website blocking/unblocking (hosts file modification)")
         print(f"   - Process termination (app blocking)")
         print(f"   - System control commands (lock, shutdown, restart)")
-        print(f"   ⚠️  To enable: Right-click client.py → Run as Administrator")
+        print(f"   To enable: Right-click client.py Run as Administrator")
     print(f"\n{'='*60}\n")
     
     # Register device

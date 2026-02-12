@@ -70,20 +70,20 @@ oLink.Save
         os.system(f'cscript.exe "{vbs_file}" //nologo')
         vbs_file.unlink()
         
-        print(f"✅ Added to startup folder: {shortcut_path}")
+        print(f" Added to startup folder: {shortcut_path}")
         return True
     except Exception as e:
-        print(f"⚠️ Warning: Could not add to startup folder: {e}")
+        print(f"️ Warning: Could not add to startup folder: {e}")
         try:
             # Fallback: Add to registry
             key_path = r"Software\Microsoft\Windows\CurrentVersion\Run"
             reg_key = winreg.OpenKey(winreg.HKEY_CURRENT_USER, key_path, 0, winreg.KEY_SET_VALUE)
             winreg.SetValueEx(reg_key, "ParentEye", 0, winreg.REG_SZ, exe_path)
             winreg.CloseKey(reg_key)
-            print(f"✅ Added to Windows registry startup")
+            print(f" Added to Windows registry startup")
             return True
         except Exception as e2:
-            print(f"❌ Failed to add to startup: {e2}")
+            print(f" Failed to add to startup: {e2}")
             return False
 
 def setup_environment():
@@ -95,7 +95,7 @@ def setup_environment():
         example_file = Path(__file__).parent / ".env.example"
         if example_file.exists():
             shutil.copy(example_file, env_file)
-            print("✅ Created .env from .env.example")
+            print(" Created .env from .env.example")
 
 def main():
     """Main entry point"""
@@ -116,7 +116,7 @@ def main():
         add_to_startup(exe_path)
     
     print("\n" + "="*70)
-    print("🚀 ParentEye Client Starting...")
+    print(" ParentEye Client Starting...")
     print("="*70)
     
     # Now import and run the actual client
@@ -128,13 +128,13 @@ def main():
         client_main()
         
     except ImportError as e:
-        print(f"❌ ERROR: Could not import client module: {e}")
+        print(f" ERROR: Could not import client module: {e}")
         print("Make sure client.py is in the same directory")
         import time
         time.sleep(5)
         sys.exit(1)
     except Exception as e:
-        print(f"❌ UNEXPECTED ERROR: {e}")
+        print(f" UNEXPECTED ERROR: {e}")
         import traceback
         traceback.print_exc()
         import time
